@@ -258,7 +258,7 @@ public class KdTreeST<Value> {
         return p.x() >= 0 && p.x() <= 1 && p.y() >= 0 && p.y() <= 1;
     }
 
-    // Helper method to check if a rectangle is inside or overlaps the unit square
+    // helper method to check if a rectangle is inside or overlaps the unit square
     private boolean isRectInsideUnitSquare(RectHV rect) {
         return rect.xmin() <= 1 && rect.xmax() >= 0 && rect.ymin()
                 <= 1 && rect.ymax() >= 0;

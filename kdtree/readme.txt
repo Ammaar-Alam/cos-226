@@ -39,7 +39,7 @@ Programming Assignment 5: K-d Trees
                 ------------------------------------------------------
 PointST:
 
-KdTreeST:
+KdTreeST:       542658.96
 
 Note: more calls per second indicates better performance.
 
@@ -55,7 +55,7 @@ Note: more calls per second indicates better performance.
  *  Hint: consider a range search. What can you do when the query rectangle
  *  completely contains the rectangle corresponding to a node?
  **************************************************************************** */
- 
+
 
 /* *****************************************************************************
  *  Known bugs / limitations.
@@ -64,14 +64,14 @@ Note: more calls per second indicates better performance.
 
 
 /* *****************************************************************************
- *  Describe any serious problems you encountered.                    
+ *  Describe any serious problems you encountered.
  **************************************************************************** */
 
 
 
 
 /* *****************************************************************************
- *  List any other comments here. Feel free to provide any feedback   
- *  on  how helpful the class meeting was and on how much you learned 
+ *  List any other comments here. Feel free to provide any feedback
+ *  on  how helpful the class meeting was and on how much you learned
  * from doing the assignment, and whether you enjoyed doing it.
  **************************************************************************** */
