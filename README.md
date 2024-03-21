@@ -73,7 +73,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
         <a href=""> KD Trees </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/kdtree/specification.php">
-        <img src="kdtree" width = 300>
+        <img src="kdtree/logo.png" width = 300>
       </a>
     </td>
     <td>
