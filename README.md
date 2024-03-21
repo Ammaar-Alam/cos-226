@@ -109,10 +109,10 @@ Most of the dependencies that I used are contained within the course's algs4.jar
       </a>
     </td>
     <td>
-      <div align="center"> Build a <a href="https://wordnet.princeton.edu"> WordNet </a> object with built-in search methods </div>
+      <div align="center"> TBD </div>
     </td>
     <td>
-      <div align="center"> hash tables, depth-first search, breadth-first search, topological sort, minimum spanning trees, Kruskal's algorithm, Prim's algorithm </div>
+      <div align="center"> TBD </div>
     </td>
   </tr>
    <tr>
@@ -125,10 +125,10 @@ Most of the dependencies that I used are contained within the course's algs4.jar
       </a>
     </td>
     <td>
-      <div align="center"> Content-aware image resizing API </div>
+      <div align="center"> TBD </div>
     </td>
     <td>
-      <div align="center"> Bellman-Ford algorithm, Dijkstra's algorithm, Ford-Fulkerson algorithm, MinCuts, MaxFlows </div>
+      <div align="center"> TBD </div>
     </td>
   </tr>
 </table>
