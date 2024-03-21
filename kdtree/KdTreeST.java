@@ -56,19 +56,21 @@ public class KdTreeST<Value> {
 
     // inlining comparison for the orientation
     private static int compareTo(Point2D a, Point2D b, boolean orientation) {
-        return orientation ? Double.compare(a.x(), b.x()) :
-               Double.compare(a.y(), b.y());
+        if (orientation) {
+            return Double.compare(a.x(), b.x());
+        }
+        else {
+            return Double.compare(a.y(), b.y());
+        }
     }
 
-
-    // put a new key value pair into the tree
     // put a new key value pair into the tree
     public void put(Point2D p, Value val) {
         if (p == null || val == null)
             throw new IllegalArgumentException("arg to put() is null");
         if (p.x() < 0 || p.x() > 1 || p.y() < 0 || p.y() > 1) {
             throw new IllegalArgumentException(
-                    "poitn coordinates should fall "
+                    "point coordinates should fall "
                             + "within the unit square [0, 1] x [0, 1]");
         }
         root = put(root, p, val, 0, 0, 1, 1, VERTICAL);
@@ -79,8 +81,7 @@ public class KdTreeST<Value> {
                      double xmin, double ymin, double xmax, double ymax,
                      boolean orientation) {
         if (h == null) {
-            RectHV rect = new RectHV(xmin, ymin, xmax, ymax);
-            return new Node(p, val, rect, 1);
+            return new Node(p, val, new RectHV(xmin, ymin, xmax, ymax), 1);
         }
 
         int cmp = compareTo(p, h.p, orientation);
@@ -110,7 +111,8 @@ public class KdTreeST<Value> {
     // get the value associated with point p
     public Value get(Point2D p) {
         if (p == null) throw new IllegalArgumentException("arg to get() is null");
-        if (!isInsideUnitSquare(p)) throw new IllegalArgumentException("arg to get() is outside unit square");
+        if (!isInsideUnitSquare(p)) throw new
+                IllegalArgumentException("arg to get() is outside unit square");
         return get(root, p, VERTICAL);
     }
 
@@ -138,7 +140,8 @@ public class KdTreeST<Value> {
     // does the tree contain point p
     public boolean contains(Point2D p) {
         if (p == null) throw new IllegalArgumentException("arg to contains() is null");
-        if (!isInsideUnitSquare(p)) throw new IllegalArgumentException("arg to contains() is outside unit square");
+        if (!isInsideUnitSquare(p)) throw new
+                IllegalArgumentException("arg to contains() is outside unit square");
         Node x = root;
         boolean orientation = VERTICAL;
 
@@ -178,7 +181,10 @@ public class KdTreeST<Value> {
     // return all points within the given rectangle
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null) throw new IllegalArgumentException("arg to range() is null");
-        if (!isRectInsideUnitSquare(rect)) throw new IllegalArgumentException("arg to range() is outside unit square"); // this rect shouldn't contain any points anyway but doesn't hurt to force the restriction
+        // this rect shouldn't contain any points
+        // anyway but doesn't hurt to force the restriction
+        if (!isRectInsideUnitSquare(rect)) throw new
+                IllegalArgumentException("arg to range() is outside unit square");
         Stack<Point2D> stack = new Stack<>();
         range(root, rect, stack);
         return stack;
@@ -196,8 +202,11 @@ public class KdTreeST<Value> {
 
     // find the closest point in the tree to a given point
     public Point2D nearest(Point2D point) {
-        if (point == null) throw new IllegalArgumentException("arg to nearest() is null");
-        if (!isInsideUnitSquare(point)) throw new IllegalArgumentException("arg to nearest() is outside unit square");
+        if (point == null) throw new
+                IllegalArgumentException("arg to nearest() is null");
+        if (!isInsideUnitSquare(point))
+            throw new IllegalArgumentException("arg to nearest() is "
+                                                       + "outside unit square");
         return nearest(root, point, null, Double.POSITIVE_INFINITY, VERTICAL);
     }
 
@@ -241,13 +250,15 @@ public class KdTreeST<Value> {
         return nearest;
     }
 
+    // checks if inside square
     private boolean isInsideUnitSquare(Point2D p) {
         return p.x() >= 0 && p.x() <= 1 && p.y() >= 0 && p.y() <= 1;
     }
 
     // Helper method to check if a rectangle is inside or overlaps the unit square
     private boolean isRectInsideUnitSquare(RectHV rect) {
-        return rect.xmin() <= 1 && rect.xmax() >= 0 && rect.ymin() <= 1 && rect.ymax() >= 0;
+        return rect.xmin() <= 1 && rect.xmax() >= 0 && rect.ymin()
+                <= 1 && rect.ymax() >= 0;
     }
 
     public static void main(String[] args) {
