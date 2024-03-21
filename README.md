@@ -93,10 +93,10 @@ Most of the dependencies that I used are contained within the course's algs4.jar
       </a>
     </td>
     <td>
-      <div align="center"> Create a 2D space partitioning binary search tree API </div>
+      <div align="center"> TBD </div>
     </td>
     <td>
-      <div align="center"> binary search trees, 2-3 trees, red-black trees, B-trees, kd-trees </div>
+      <div align="center"> TBD </div>
     </td>
   </tr>
    <tr>
