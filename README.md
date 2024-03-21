@@ -27,7 +27,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
        <a href=""> Assignment 1 </a>
      </div>
      <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/percolation/specification.php">
-       <img src="./Assignment1/src/resources/logo.png" width = 300>
+       <img src="percolation/logo.png" width = 300>
      </a>
     </td>
     <td>
