@@ -43,7 +43,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
         <a href=""> Assignment 2 </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/queues/specification.php">
-        <img src="./Assignment2/src/resources/logo.png" width = 400>
+        <img src="queues/logo.png" width = 400>
       </a>
     </td>
     <td>
@@ -59,7 +59,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
         <a href=""> Assignment 3 </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/autocomplete/specification.php">
-        <img src="./Assignment3/src/resources/logo.png" width = 300>
+        <img src="autocomplete/logo.png" width = 300>
       </a>
     </td>
     <td>
@@ -75,7 +75,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
         <a href=""> Assignment 4 </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/kdtree/specification.php">
-        <img src="./Assignment4/src/resources/logo.png" width = 300>
+        <img src="kdtree" width = 300>
       </a>
     </td>
     <td>
