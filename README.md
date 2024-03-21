@@ -134,3 +134,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
     </td>
   </tr>
 </table>
+
+### Licensing
+
+Please note, this readme was shamelessly stolen and adapted from Ryan Albertson, who's own COS-226 repository can be found [here](https://github.com/RyanAlbertson/COS226_Princeton_University).
