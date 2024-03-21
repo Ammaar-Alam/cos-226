@@ -1,6 +1,6 @@
  <img src="https://www.cs.princeton.edu/courses/archive/spring20/cos226/images/princeton-shield.gif" alt=princeton_shield align=left height=210 />
 
-## COS 226 - Algorithms and Data Structures<br></br>at Princeton University
+## COS 226 - Algorithms and Data Structures
 
 This repository contains my Java programming assignments that I completed while taking [Princeton's COS 226](https://www.cs.princeton.edu/courses/archive/spring24/cos226/syllabus.php).
 <br></br>
