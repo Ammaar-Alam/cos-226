@@ -2,7 +2,7 @@
 
 ## COS 226 - Algorithms and Data Structures
 
-This repository contains my Java programming assignments that I completed while taking [COS 226 at Princeton](https://www.cs.princeton.edu/courses/archive/spring24/cos226/syllabus.php) during the spring semester of my first year.
+This repository contains the Java programming assignments that I completed while taking [COS 226 at Princeton](https://www.cs.princeton.edu/courses/archive/spring24/cos226/syllabus.php) during the spring semester of my first year.
 
 ### Course Information
 
