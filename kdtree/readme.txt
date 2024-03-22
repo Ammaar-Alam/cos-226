@@ -119,7 +119,7 @@ no but fr, ong this assignment killed my sanity and i hated it. i wish ill upon
 the person who designed it. i hope they stub their toe every step they take for the
 next two weeks.
 
-also if i get points deducted for the 'fully' filling out the table i will find
+also if i get points deducted for not 'fully' filling out the table i will find
 the person grading this. istg i have nothing to lose after this assignment <3
 
 here's proof i have a test class for this since it's not technically in my main
