@@ -106,8 +106,8 @@ n/a
  *  Describe any serious problems you encountered.
  **************************************************************************** */
 yeah for some reason i this bug when i was coding. like the more lines i wrote and the longer i spent on the
-asssignment, my will to be a cos bse major began evaporating at an O(n!) factorial order of growth, idk why.
-i couldn't find a way to optimize or reduce the order of growth on that though :(
+asssignment, my will to be cos bse began evaporating at an O(n!) factorial order of growth, idk why.
+i couldn't find a way to optimize/reduce the order on that either :(
 
 
 /* *****************************************************************************
@@ -116,10 +116,11 @@ i couldn't find a way to optimize or reduce the order of growth on that though :
  * from doing the assignment, and whether you enjoyed doing it.
  **************************************************************************** */
 no but fr, ong this assignment killed my sanity and i hated it. i wish ill upon
-the person who designed it. i hope they stub their two every step they take for the
+the person who designed it. i hope they stub their toe every step they take for the
 next two weeks.
 
 also if i get points deducted for the 'fully' filling out the table i will find
-the person grading this istg i have nothing to lose after this assignment <3
+the person grading this. istg i have nothing to lose after this assignment <3
+
 here's proof i have a test class for this since it's not technically in my main
 for the ST class itself: https://github.com/Ammaar-Alam/cos-226/blob/main/kdtree/KdTreeTest.java
