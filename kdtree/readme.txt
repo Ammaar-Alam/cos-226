@@ -105,9 +105,9 @@ n/a
 /* *****************************************************************************
  *  Describe any serious problems you encountered.
  **************************************************************************** */
-yeah for some reason i this bug when i was coding. like the more lines i wrote and the longer i spent on the
-asssignment, my will to be cos bse began evaporating at an O(n!) factorial order of growth, idk why.
-i couldn't find a way to optimize/reduce the order on that either :(
+yeah for some reason i got this bug when i was coding. like the more lines i wrote and the longer
+i spent on the asssignment, my will to be cos bse began evaporating at an O(n!) factorial order
+of growth, idk why. i couldn't find a way to optimize/reduce the order on that either :(
 
 
 /* *****************************************************************************
