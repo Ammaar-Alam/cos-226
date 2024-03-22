@@ -1,3 +1,11 @@
+/**
+ * contains a lot of unnecessary optimizations and try/catch sequences for unit
+ * testing bc this would've been the leaderboard submission class
+ * (dont even bother looking at or trying ot understand the optimizations,
+ * at some point i stopped understanding what im writing too. it's a miracle
+ * anything still works)
+ **/
+
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.RectHV;
@@ -132,26 +140,20 @@ public class KdTreeST<Value> {
         return null;
     }
 
+    // [OLD GET METHOD IDK IF ILL NEED LATER]
     // helper method to retrieve value given a point
-    private Value get(Node h, Point2D p, boolean orientation) {
-        if (h == null) return null;
-        if (h.p.equals(p)) return h.val;
-
-        double cmp;
-        if (orientation) {
-            cmp = p.x() - h.p.x();
-        }
-        else {
-            cmp = p.y() - h.p.y();
-        }
-
-        if (cmp < 0) {
-            return get(h.lb, p, !orientation);
-        }
-        else {
-            return get(h.rt, p, !orientation);
-        }
-    }
+    // private Value get(Node h, Point2D p, boolean orientation) {
+    //     if (h == null) return null;
+    //     if (h.p.equals(p)) return h.val;
+    //
+    //     double cmp;
+    //     if (orientation) cmp = p.x() - h.p.x();
+    //     else cmp = p.y() - h.p.y();
+    //
+    //     if (cmp < 0) return get(h.lb, p, !orientation);
+    //
+    //     else return get(h.rt, p, !orientation);
+    // }
 
     // does the tree contain point p
     public boolean contains(Point2D p) {
@@ -162,15 +164,9 @@ public class KdTreeST<Value> {
         boolean orientation = VERTICAL;
         while (x != null) {
             int cmp = compareTo(p, x.p, orientation);
-            if (cmp < 0) {
-                x = x.lb;
-            }
-            else if (cmp > 0) {
-                x = x.rt;
-            }
-            else {
-                return true;
-            }
+            if (cmp < 0) x = x.lb;
+            else if (cmp > 0) x = x.rt;
+            else return true;
             orientation = !orientation;
         }
         return false;
@@ -235,12 +231,8 @@ public class KdTreeST<Value> {
 
         Node first, second;
         double cmp;
-        if (orientation) {
-            cmp = p.x() - h.p.x();
-        }
-        else {
-            cmp = p.y() - h.p.y();
-        }
+        if (orientation) cmp = p.x() - h.p.x();
+        else cmp = p.y() - h.p.y();
 
         if (cmp < 0) {
             first = h.lb;
@@ -324,7 +316,7 @@ public class KdTreeST<Value> {
             StdOut.println("Value associated with point " + p + ": " + value);
         }
 
-        // corner tests
+        // corner tests (my tigerfile ran out idk if these are done right)
         try {
             kdTree.put(null, 0);
             StdOut.println("put() failed to throw an exception for null point");
