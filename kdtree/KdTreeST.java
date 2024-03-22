@@ -11,18 +11,12 @@ public class KdTreeST<Value> {
 
     // node representation
     private class Node {
-        // the point
-        private Point2D p;
-        // the symbol table maps the point to this value
-        private Value val;
-        // the axis-aligned rectangle corresponding to this node
-        private RectHV rect;
-        // the left/bottom subtree
-        private Node lb;
-        // the right/top subtree
-        private Node rt;
-        // size of the subtree
-        private int size;
+        private Point2D p; // the point
+        private Value val; // the symbol table maps the point to this value
+        private RectHV rect; // the axis-aligned rectangle corresponding to this node
+        private Node lb; // the left/bottom subtree
+        private Node rt; // the right/top subtree
+        private int size; // size of the subtree
 
         // constructor for a new node
         public Node(Point2D p, Value val, RectHV rect, int size) {
@@ -55,12 +49,16 @@ public class KdTreeST<Value> {
     }
 
     // inlining comparison for the orientation
-    private static int compareTo(Point2D a, Point2D b, boolean orientation) {
+    private int compareTo(Point2D p1, Point2D p2, boolean orientation) {
         if (orientation) {
-            return Double.compare(a.x(), b.x());
+            int cmp = Double.compare(p1.x(), p2.x());
+            if (cmp != 0) return cmp;
+            return Double.compare(p1.y(), p2.y());
         }
         else {
-            return Double.compare(a.y(), b.y());
+            int cmp = Double.compare(p1.y(), p2.y());
+            if (cmp != 0) return cmp;
+            return Double.compare(p1.x(), p2.x());
         }
     }
 
@@ -116,7 +114,22 @@ public class KdTreeST<Value> {
         if (p == null) throw new IllegalArgumentException("arg to get() is null");
         if (!isInsideUnitSquare(p)) throw new
                 IllegalArgumentException("arg to get() is outside unit square");
-        return get(root, p, VERTICAL);
+        Node x = root;
+        boolean orientation = VERTICAL;
+        while (x != null) {
+            int cmp = compareTo(p, x.p, orientation);
+            if (cmp < 0) {
+                x = x.lb;
+            }
+            else if (cmp > 0) {
+                x = x.rt;
+            }
+            else {
+                return x.val;
+            }
+            orientation = !orientation;
+        }
+        return null;
     }
 
     // helper method to retrieve value given a point
@@ -147,38 +160,34 @@ public class KdTreeST<Value> {
                 IllegalArgumentException("arg to contains() is outside unit square");
         Node x = root;
         boolean orientation = VERTICAL;
-
         while (x != null) {
             int cmp = compareTo(p, x.p, orientation);
             if (cmp < 0) {
                 x = x.lb;
             }
-            else if (cmp > 0 || (cmp == 0 && compareTo(p, x.p, !orientation) != 0)) {
+            else if (cmp > 0) {
                 x = x.rt;
             }
             else {
-                return true; // Found the point
+                return true;
             }
             orientation = !orientation;
         }
-        return false; // Did not find the point
+        return false;
     }
 
     // return all points in the tree in level order
     public Iterable<Point2D> points() {
-        Queue<Node> queue = new Queue<>();
-        Queue<Point2D> points = new Queue<>();
-        queue.enqueue(root);
-
-        while (!queue.isEmpty()) {
-            Node node = queue.dequeue();
-            if (node == null) continue;
-            points.enqueue(node.p);
-            queue.enqueue(node.lb);
-            queue.enqueue(node.rt);
+        Queue<Point2D> queue = new Queue<>();
+        Queue<Node> nodeQueue = new Queue<>();
+        if (root != null) nodeQueue.enqueue(root);
+        while (!nodeQueue.isEmpty()) {
+            Node x = nodeQueue.dequeue();
+            queue.enqueue(x.p);
+            if (x.lb != null) nodeQueue.enqueue(x.lb);
+            if (x.rt != null) nodeQueue.enqueue(x.rt);
         }
-
-        return points;
+        return queue;
     }
 
     // return all points within the given rectangle
@@ -210,17 +219,17 @@ public class KdTreeST<Value> {
         if (!isInsideUnitSquare(point))
             throw new IllegalArgumentException("arg to nearest() is "
                                                        + "outside unit square");
-        return nearest(root, point, null, Double.POSITIVE_INFINITY, VERTICAL);
+        return nearest(root, point, root.p, Double.POSITIVE_INFINITY, VERTICAL);
     }
 
     // helper method to find the nearest point
-    private Point2D nearest(Node h, Point2D p, Point2D nearest, double nearestDist,
+    private Point2D nearest(Node h, Point2D p, Point2D nearest, double nearestDistSq,
                             boolean orientation) {
         if (h == null) return nearest;
 
-        double dist = h.p.distanceSquaredTo(p);
-        if (dist < nearestDist) {
-            nearestDist = dist;
+        double distSq = h.p.distanceSquaredTo(p);
+        if (distSq < nearestDistSq) {
+            nearestDistSq = distSq;
             nearest = h.p;
         }
 
@@ -242,12 +251,12 @@ public class KdTreeST<Value> {
             second = h.lb;
         }
 
-        if (first != null && first.rect.distanceSquaredTo(p) < nearestDist) {
-            nearest = nearest(first, p, nearest, nearestDist, !orientation);
-            nearestDist = nearest.distanceSquaredTo(p);
+        if (first != null) {
+            nearest = nearest(first, p, nearest, nearestDistSq, !orientation);
+            nearestDistSq = nearest.distanceSquaredTo(p);
         }
-        if (second != null && second.rect.distanceSquaredTo(p) < nearestDist) {
-            nearest = nearest(second, p, nearest, nearestDist, !orientation);
+        if (second != null && second.rect.distanceSquaredTo(p) < nearestDistSq) {
+            nearest = nearest(second, p, nearest, nearestDistSq, !orientation);
         }
 
         return nearest;
