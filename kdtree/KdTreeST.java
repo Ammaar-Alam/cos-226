@@ -277,6 +277,7 @@ public class KdTreeST<Value> {
                 new Point2D(0.5, 0.1),
                 new Point2D(0.9, 0.6),
                 new Point2D(0.7, 0.2)
+
         };
 
         for (int i = 0; i < testPoints.length; i++) {
