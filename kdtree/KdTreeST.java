@@ -56,16 +56,10 @@ public class KdTreeST<Value> {
 
     // put a new key value pair into the tree
     public void put(Point2D p, Value val) {
-        if (p == null || val == null) throw new
-                IllegalArgumentException("arg to put() is null");
-        /** if (p.x() < 0 || p.x() > 1 || p.y() < 0 || p.y() > 1) {
-         throw new IllegalArgumentException("poitn coordinates should be "
-         + "between 0 and 1");
-         } **/// idk why i thought we need to have this real world check lol
-        root = put(root, p, val, new RectHV(Double.NEGATIVE_INFINITY,
-                                            Double.NEGATIVE_INFINITY,
-                                            Double.POSITIVE_INFINITY,
-                                            Double.POSITIVE_INFINITY), VERTICAL);
+        if (p == null || val == null) throw new IllegalArgumentException("arg to put() is null");
+        root = put(root, p, val, new RectHV(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY,
+                                            Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY),
+                   VERTICAL);
     }
 
     // helper method to insert a new node into the tree
@@ -85,7 +79,6 @@ public class KdTreeST<Value> {
         }
 
         RectHV subRect;
-
         if (cmp < 0) {
             if (orientation) {
                 subRect = new RectHV(rect.xmin(), rect.ymin(), h.p.x(), rect.ymax());
@@ -93,8 +86,7 @@ public class KdTreeST<Value> {
             else {
                 subRect = new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), h.p.y());
             }
-            if (h.lb == null) h.lb = put(h.lb, p, val, subRect, !orientation);
-            else put(h.lb, p, val, h.lb.rect, !orientation);
+            h.lb = put(h.lb, p, val, subRect, !orientation);
         }
         else {
             if (orientation) {
@@ -103,8 +95,7 @@ public class KdTreeST<Value> {
             else {
                 subRect = new RectHV(rect.xmin(), h.p.y(), rect.xmax(), rect.ymax());
             }
-            if (h.rt == null) h.rt = put(h.rt, p, val, subRect, !orientation);
-            else put(h.rt, p, val, h.rt.rect, !orientation);
+            h.rt = put(h.rt, p, val, subRect, !orientation);
         }
 
         h.size = 1 + size(h.lb) + size(h.rt);
@@ -316,7 +307,7 @@ public class KdTreeST<Value> {
     //
     //     // Test nearest neighbor search
     //     StdOut.println(
-    //             "Nearest neighbor to point (0.6, 0.6): " + 
+    //             "Nearest neighbor to point (0.6, 0.6): " +
     //             kdTree.nearest(new Point2D(0.6, 0.6)));
     // }
 }
