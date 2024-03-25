@@ -63,7 +63,7 @@ Prune subtree if it can't contain a closer point
                 ------------------------------------------------------
 PointST:
 
-KdTreeST:       524227.4329264105 calls to nearest() per second
+KdTreeST:       527734.2836772314 calls to nearest() per second
 
 (i made a test class to calculate that already, im not manually figuring out the
 individual components when i already have the final value)
