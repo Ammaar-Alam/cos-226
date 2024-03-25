@@ -60,12 +60,12 @@ public class KdTreeST<Value> {
         if (orientation) {
             int cmp = Double.compare(p1.x(), p2.x());
             if (cmp != 0) return cmp;
-            return Double.compare(p1.y(), p2.y());
+            return 1;
         }
         else {
             int cmp = Double.compare(p1.y(), p2.y());
             if (cmp != 0) return cmp;
-            return Double.compare(p1.x(), p2.x());
+            return 1;
         }
     }
 
@@ -73,12 +73,11 @@ public class KdTreeST<Value> {
     public void put(Point2D p, Value val) {
         if (p == null || val == null)
             throw new IllegalArgumentException("arg to put() is null");
-        if (p.x() < 0 || p.x() > 1 || p.y() < 0 || p.y() > 1) {
-            throw new IllegalArgumentException(
-                    "point coordinates should fall "
-                            + "within the unit square [0, 1] x [0, 1]");
-        }
-        root = put(root, p, val, new RectHV(0, 0, 1, 1), VERTICAL);
+        root = put(root, p, val, new RectHV(Double.NEGATIVE_INFINITY,
+                                            Double.NEGATIVE_INFINITY,
+                                            Double.POSITIVE_INFINITY,
+                                            Double.POSITIVE_INFINITY),
+                   VERTICAL);
     }
 
     // helper method to insert a new node into the tree
@@ -98,7 +97,7 @@ public class KdTreeST<Value> {
                 h.lb = put(h.lb, p, val, rect, !orientation);
             }
         }
-        else if (cmp > 0 || (cmp == 0 && compareTo(p, h.p, !orientation) != 0)) {
+        else {
             if (orientation) {
                 rect = new RectHV(h.p.x(), rect.ymin(), rect.xmax(), rect.ymax());
                 h.rt = put(h.rt, p, val, rect, !orientation);
@@ -108,9 +107,6 @@ public class KdTreeST<Value> {
                 h.rt = put(h.rt, p, val, rect, !orientation);
             }
         }
-        else {
-            h.val = val;
-        }
         h.size = 1 + size(h.lb) + size(h.rt);
         return h;
     }
@@ -118,6 +114,7 @@ public class KdTreeST<Value> {
     // get the value associated with point p
     public Value get(Point2D p) {
         if (p == null) throw new IllegalArgumentException("arg to get() is null");
+        if (isEmpty()) return null;
         Node x = root;
         boolean orientation = VERTICAL;
         while (x != null) {
@@ -154,6 +151,7 @@ public class KdTreeST<Value> {
     // does the tree contain point p
     public boolean contains(Point2D p) {
         if (p == null) throw new IllegalArgumentException("arg to contains() is null");
+        if (isEmpty()) return false;
         Node x = root;
         boolean orientation = VERTICAL;
         while (x != null) {
@@ -165,7 +163,6 @@ public class KdTreeST<Value> {
         }
         return false;
     }
-
 
     // return all points in the tree in level order
     public Iterable<Point2D> points() {
@@ -180,7 +177,6 @@ public class KdTreeST<Value> {
         }
         return queue;
     }
-
 
     // return all points within the given rectangle
     public Iterable<Point2D> range(RectHV rect) {
@@ -204,9 +200,9 @@ public class KdTreeST<Value> {
     public Point2D nearest(Point2D point) {
         if (point == null) throw new IllegalArgumentException("arg to nearest() "
                                                                       + "is null");
+        if (isEmpty()) return null;
         return nearest(root, point, root.p, Double.POSITIVE_INFINITY, VERTICAL);
     }
-
 
     // helper method to find the nearest point
     private Point2D nearest(Node h, Point2D p, Point2D nearest, double nearestDistSq,
@@ -244,7 +240,6 @@ public class KdTreeST<Value> {
         return nearest;
     }
 
-
     // // checks if inside square
     // private boolean isInsideUnitSquare(Point2D p) {
     //     return p.x() >= 0 && p.x() <= 1 && p.y() >= 0 && p.y() <= 1;
@@ -268,7 +263,6 @@ public class KdTreeST<Value> {
                 new Point2D(0.5, 0.1),
                 new Point2D(0.9, 0.6),
                 new Point2D(0.7, 0.2)
-
         };
 
         for (int i = 0; i < testPoints.length; i++) {
@@ -308,7 +302,7 @@ public class KdTreeST<Value> {
             StdOut.println("Value associated with point " + p + ": " + value);
         }
 
-        // corner tests (my tigerfile ran out idk if these are done right)
+        // corner tests
         try {
             kdTree.put(null, 0);
             StdOut.println("put() failed to throw an exception for null point");
@@ -318,23 +312,11 @@ public class KdTreeST<Value> {
         }
 
         try {
-            kdTree.put(new Point2D(1.1, 0.1), 0);
-            StdOut.println("put() failed to throw an exception for "
-                                   + "point outside unit square");
+            kdTree.get(null);
+            StdOut.println("get() failed to throw an exception for null point");
         }
         catch (IllegalArgumentException e) {
-            StdOut.println("put() correctly threw an exception for "
-                                   + "point outside unit square");
-        }
-
-        try {
-            kdTree.get(new Point2D(1.1, 0.1));
-            StdOut.println("get() failed to throw an exception for "
-                                   + "point outside unit square");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("get() correctly threw an exception for "
-                                   + "point outside unit square");
+            StdOut.println("get() correctly threw an exception for null point");
         }
 
         try {
@@ -346,31 +328,11 @@ public class KdTreeST<Value> {
         }
 
         try {
-            kdTree.contains(new Point2D(1.1, 0.1));
-            StdOut.println("contains() failed to throw an exception for "
-                                   + "point outside unit square");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("contains() correctly threw an exception for "
-                                   + "point outside unit square");
-        }
-
-        try {
             kdTree.range(null);
             StdOut.println("range() failed to throw an exception for null rectangle");
         }
         catch (IllegalArgumentException e) {
             StdOut.println("range() correctly threw an exception for null rectangle");
-        }
-
-        try {
-            kdTree.range(new RectHV(1.1, 0.1, 1.2, 0.2));
-            StdOut.println("range() failed to throw an exception for "
-                                   + "rectangle outside unit square");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("range() correctly threw an exception for "
-                                   + "rectangle outside unit square");
         }
 
         try {
@@ -380,55 +342,5 @@ public class KdTreeST<Value> {
         catch (IllegalArgumentException e) {
             StdOut.println("nearest() correctly threw an exception for null point");
         }
-
-        try {
-            kdTree.nearest(new Point2D(1.1, 0.1));
-            StdOut.println("nearest() failed to throw an exception for "
-                                   + "point outside unit square");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("nearest() correctly threw an exception for "
-                                   + "point outside unit square");
-        }
     }
-
-    // public static void main(String[] args) {
-    //     // Create a KdTreeST instance
-    //     KdTreeST<Integer> kdTree = new KdTreeST<>();
-    //     String filename = args[0];
-    //     In in = new In(filename);
-    //
-    //     // Insert points with associated values
-    //     for (int i = 0; !in.isEmpty(); i++) {
-    //         double x = in.readDouble();
-    //         double y = in.readDouble();
-    //         Point2D p = new Point2D(x, y);
-    //         kdTree.put(p, i);
-    //     }
-    //
-    //     // Check isEmpty() and size()
-    //     StdOut.println("Is the kd-tree empty? " + kdTree.isEmpty());
-    //     StdOut.println("Size of kd-tree: " + kdTree.size());
-    //
-    //     // Test contains()
-    //     StdOut.println(
-    //             "Does the kd-tree contain (0.7, 0.2)? " +
-    //             kdTree.contains(new Point2D(0.7, 0.2)));
-    //
-    //     // Test get()
-    //     StdOut.println(
-    //             "Value associated with (0.7, 0.2): " +
-    //             kdTree.get(new Point2D(0.7, 0.2)));
-    //
-    //     // Test range search
-    //     StdOut.println("Points within the rectangle [0.2, 0.2] x [0.8, 0.8]:");
-    //     for (Point2D p : kdTree.range(new RectHV(0.2, 0.2, 0.8, 0.8))) {
-    //         StdOut.println(p);
-    //     }
-    //
-    //     // Test nearest neighbor search
-    //     StdOut.println(
-    //             "Nearest neighbor to point (0.6, 0.6): " +
-    //             kdTree.nearest(new Point2D(0.6, 0.6)));
-    // }
 }
