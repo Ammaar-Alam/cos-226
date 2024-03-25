@@ -1,10 +1,3 @@
-/**
- * contains a lot of unnecessary optimizations and try/catch sequences for unit tests
- * (dont even bother looking at or trying ot understand the optimizations,
- * at some point i stopped understanding what im writing too. it's a miracle
- * anything still works)
- **/
-
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.RectHV;
@@ -18,12 +11,18 @@ public class KdTreeST<Value> {
 
     // node representation
     private class Node {
-        private Point2D p; // the point
-        private Value val; // the symbol table maps the point to this value
-        private RectHV rect; // the axis-aligned rectangle corresponding to this node
-        private Node lb; // the left/bottom subtree
-        private Node rt; // the right/top subtree
-        private int size; // size of the subtree
+        // the point
+        private Point2D p;
+        // the symbol table maps the point to this value
+        private Value val;
+        // the axis-aligned rectangle corresponding to this node
+        private RectHV rect;
+        // the left/bottom subtree
+        private Node lb;
+        // the right/top subtree
+        private Node rt;
+        // size of the subtree
+        private int size;
 
         // constructor for a new node
         public Node(Point2D p, Value val, RectHV rect, int size) {
@@ -55,127 +54,112 @@ public class KdTreeST<Value> {
         return size(root);
     }
 
-    // inlining comparison for the orientation
-    private int compareTo(Point2D p1, Point2D p2, boolean orientation) {
-        if (orientation) {
-            int cmp = Double.compare(p1.x(), p2.x());
-            if (cmp != 0) return cmp;
-            return 1;
-        }
-        else {
-            int cmp = Double.compare(p1.y(), p2.y());
-            if (cmp != 0) return cmp;
-            return 1;
-        }
-    }
-
     // put a new key value pair into the tree
     public void put(Point2D p, Value val) {
-        if (p == null || val == null)
-            throw new IllegalArgumentException("arg to put() is null");
+        if (p == null || val == null) throw new
+                IllegalArgumentException("arg to put() is null");
+        /** if (p.x() < 0 || p.x() > 1 || p.y() < 0 || p.y() > 1) {
+         throw new IllegalArgumentException("poitn coordinates should be "
+         + "between 0 and 1");
+         } **/// idk why i thought we need to have this real world check lol
         root = put(root, p, val, new RectHV(Double.NEGATIVE_INFINITY,
                                             Double.NEGATIVE_INFINITY,
                                             Double.POSITIVE_INFINITY,
-                                            Double.POSITIVE_INFINITY),
-                   VERTICAL);
+                                            Double.POSITIVE_INFINITY), VERTICAL);
     }
 
     // helper method to insert a new node into the tree
     private Node put(Node h, Point2D p, Value val, RectHV rect, boolean orientation) {
-        if (h == null) {
-            return new Node(p, val, rect, 1);
+        if (h == null) return new Node(p, val, rect, 1);
+        if (h.p.equals(p)) {
+            h.val = val;
+            return h;
         }
 
-        int cmp = compareTo(p, h.p, orientation);
+        double cmp;
+        if (orientation) {
+            cmp = p.x() - h.p.x();
+        }
+        else {
+            cmp = p.y() - h.p.y();
+        }
+
+        RectHV subRect;
+
         if (cmp < 0) {
             if (orientation) {
-                rect = new RectHV(rect.xmin(), rect.ymin(), h.p.x(), rect.ymax());
-                h.lb = put(h.lb, p, val, rect, !orientation);
+                subRect = new RectHV(rect.xmin(), rect.ymin(), h.p.x(), rect.ymax());
             }
             else {
-                rect = new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), h.p.y());
-                h.lb = put(h.lb, p, val, rect, !orientation);
+                subRect = new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), h.p.y());
             }
+            if (h.lb == null) h.lb = put(h.lb, p, val, subRect, !orientation);
+            else put(h.lb, p, val, h.lb.rect, !orientation);
         }
         else {
             if (orientation) {
-                rect = new RectHV(h.p.x(), rect.ymin(), rect.xmax(), rect.ymax());
-                h.rt = put(h.rt, p, val, rect, !orientation);
+                subRect = new RectHV(h.p.x(), rect.ymin(), rect.xmax(), rect.ymax());
             }
             else {
-                rect = new RectHV(rect.xmin(), h.p.y(), rect.xmax(), rect.ymax());
-                h.rt = put(h.rt, p, val, rect, !orientation);
+                subRect = new RectHV(rect.xmin(), h.p.y(), rect.xmax(), rect.ymax());
             }
+            if (h.rt == null) h.rt = put(h.rt, p, val, subRect, !orientation);
+            else put(h.rt, p, val, h.rt.rect, !orientation);
         }
+
         h.size = 1 + size(h.lb) + size(h.rt);
         return h;
+        // im hoping and begging that this properly handles recursive rectangle stuff
     }
 
     // get the value associated with point p
     public Value get(Point2D p) {
         if (p == null) throw new IllegalArgumentException("arg to get() is null");
-        if (isEmpty()) return null;
-        Node x = root;
-        boolean orientation = VERTICAL;
-        while (x != null) {
-            int cmp = compareTo(p, x.p, orientation);
-            if (cmp < 0) {
-                x = x.lb;
-            }
-            else if (cmp > 0) {
-                x = x.rt;
-            }
-            else {
-                return x.val;
-            }
-            orientation = !orientation;
-        }
-        return null;
+        return get(root, p, VERTICAL);
     }
 
-    // [OLD GET METHOD IDK IF ILL NEED LATER]
     // helper method to retrieve value given a point
-    // private Value get(Node h, Point2D p, boolean orientation) {
-    //     if (h == null) return null;
-    //     if (h.p.equals(p)) return h.val;
-    //
-    //     double cmp;
-    //     if (orientation) cmp = p.x() - h.p.x();
-    //     else cmp = p.y() - h.p.y();
-    //
-    //     if (cmp < 0) return get(h.lb, p, !orientation);
-    //
-    //     else return get(h.rt, p, !orientation);
-    // }
+    private Value get(Node h, Point2D p, boolean orientation) {
+        if (h == null) return null;
+        if (h.p.equals(p)) return h.val;
+
+        double cmp;
+        if (orientation) {
+            cmp = p.x() - h.p.x();
+        }
+        else {
+            cmp = p.y() - h.p.y();
+        }
+
+        if (cmp < 0) {
+            return get(h.lb, p, !orientation);
+        }
+        else {
+            return get(h.rt, p, !orientation);
+        }
+    }
 
     // does the tree contain point p
     public boolean contains(Point2D p) {
-        if (p == null) throw new IllegalArgumentException("arg to contains() is null");
-        if (isEmpty()) return false;
-        Node x = root;
-        boolean orientation = VERTICAL;
-        while (x != null) {
-            int cmp = compareTo(p, x.p, orientation);
-            if (cmp < 0) x = x.lb;
-            else if (cmp > 0) x = x.rt;
-            else return true;
-            orientation = !orientation;
-        }
-        return false;
+        if (p == null) throw new IllegalArgumentException("arg to contain() is null");
+        return get(p) != null;
     }
 
     // return all points in the tree in level order
     public Iterable<Point2D> points() {
-        Queue<Point2D> queue = new Queue<>();
-        Queue<Node> nodeQueue = new Queue<>();
-        if (root != null) nodeQueue.enqueue(root);
-        while (!nodeQueue.isEmpty()) {
-            Node x = nodeQueue.dequeue();
-            queue.enqueue(x.p);
-            if (x.lb != null) nodeQueue.enqueue(x.lb);
-            if (x.rt != null) nodeQueue.enqueue(x.rt);
+        Queue<Node> queue = new Queue<>();
+        Queue<Point2D> points = new Queue<>();
+        queue.enqueue(root);
+
+        while (!queue.isEmpty()) {
+            Node node = queue.dequeue();
+            if (node == null) continue;
+            points.enqueue(node.p);
+            queue.enqueue(node.lb);
+            queue.enqueue(node.rt);
         }
-        return queue;
+
+        return points;
     }
 
     // return all points within the given rectangle
@@ -198,27 +182,29 @@ public class KdTreeST<Value> {
 
     // find the closest point in the tree to a given point
     public Point2D nearest(Point2D point) {
-        if (point == null) throw new IllegalArgumentException("arg to nearest() "
-                                                                      + "is null");
-        if (isEmpty()) return null;
-        return nearest(root, point, root.p, Double.POSITIVE_INFINITY, VERTICAL);
+        if (point == null) throw new IllegalArgumentException(" to nearest() is null");
+        return nearest(root, point, null, Double.POSITIVE_INFINITY, VERTICAL);
     }
 
     // helper method to find the nearest point
-    private Point2D nearest(Node h, Point2D p, Point2D nearest, double nearestDistSq,
+    private Point2D nearest(Node h, Point2D p, Point2D nearest, double nearestDist,
                             boolean orientation) {
         if (h == null) return nearest;
 
-        double distSq = h.p.distanceSquaredTo(p);
-        if (distSq < nearestDistSq) {
-            nearestDistSq = distSq;
+        double dist = h.p.distanceSquaredTo(p);
+        if (dist < nearestDist) {
+            nearestDist = dist;
             nearest = h.p;
         }
 
         Node first, second;
         double cmp;
-        if (orientation) cmp = p.x() - h.p.x();
-        else cmp = p.y() - h.p.y();
+        if (orientation) {
+            cmp = p.x() - h.p.x();
+        }
+        else {
+            cmp = p.y() - h.p.y();
+        }
 
         if (cmp < 0) {
             first = h.lb;
@@ -229,27 +215,16 @@ public class KdTreeST<Value> {
             second = h.lb;
         }
 
-        if (first != null) {
-            nearest = nearest(first, p, nearest, nearestDistSq, !orientation);
-            nearestDistSq = nearest.distanceSquaredTo(p);
+        if (first != null && first.rect.distanceSquaredTo(p) < nearestDist) {
+            nearest = nearest(first, p, nearest, nearestDist, !orientation);
+            nearestDist = nearest.distanceSquaredTo(p);
         }
-        if (second != null && second.rect.distanceSquaredTo(p) < nearestDistSq) {
-            nearest = nearest(second, p, nearest, nearestDistSq, !orientation);
+        if (second != null && second.rect.distanceSquaredTo(p) < nearestDist) {
+            nearest = nearest(second, p, nearest, nearestDist, !orientation);
         }
 
         return nearest;
     }
-
-    // // checks if inside square
-    // private boolean isInsideUnitSquare(Point2D p) {
-    //     return p.x() >= 0 && p.x() <= 1 && p.y() >= 0 && p.y() <= 1;
-    // }
-    //
-    // // helper method to check if a rectangle is inside or overlaps the unit square
-    // private boolean isRectInsideUnitSquare(RectHV rect) {
-    //     return rect.xmin() <= 1 && rect.xmax() >= 0 && rect.ymin()
-    //             <= 1 && rect.ymax() >= 0;
-    // }
 
     public static void main(String[] args) {
         KdTreeST<Integer> kdTree = new KdTreeST<>();
@@ -270,12 +245,13 @@ public class KdTreeST<Value> {
         }
 
         // testing size
-        StdOut.println("Testing size: " + (kdTree.size() == testPoints.length));
+        StdOut.println("Testing size: " + kdTree.size());
 
         // testing contains
-        for (Point2D p : testPoints) {
-            boolean contains = kdTree.contains(p);
-            StdOut.println("Testing contains for point " + p + ": " + contains);
+        for (int i = 0; i < testPoints.length; i++) {
+            boolean contains = kdTree.contains(testPoints[i]);
+            StdOut.println("Testing contains for point " +
+                                   testPoints[i] + ": " + contains);
         }
 
         // testing range
@@ -297,50 +273,50 @@ public class KdTreeST<Value> {
         }
 
         // testing get
-        for (Point2D p : testPoints) {
-            int value = kdTree.get(p);
-            StdOut.println("Value associated with point " + p + ": " + value);
-        }
-
-        // corner tests
-        try {
-            kdTree.put(null, 0);
-            StdOut.println("put() failed to throw an exception for null point");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("put() correctly threw an exception for null point");
-        }
-
-        try {
-            kdTree.get(null);
-            StdOut.println("get() failed to throw an exception for null point");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("get() correctly threw an exception for null point");
-        }
-
-        try {
-            kdTree.contains(null);
-            StdOut.println("contains() failed to throw an exception for null point");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("contains() correctly threw an exception for null point");
-        }
-
-        try {
-            kdTree.range(null);
-            StdOut.println("range() failed to throw an exception for null rectangle");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("range() correctly threw an exception for null rectangle");
-        }
-
-        try {
-            kdTree.nearest(null);
-            StdOut.println("nearest() failed to throw an exception for null point");
-        }
-        catch (IllegalArgumentException e) {
-            StdOut.println("nearest() correctly threw an exception for null point");
+        for (int i = 0; i < testPoints.length; i++) {
+            int value = kdTree.get(testPoints[i]);
+            StdOut.println("Value associated with point "
+                                   + testPoints[i] + ": " + value);
         }
     }
+
+    // public static void main(String[] args) {
+    //     // Create a KdTreeST instance
+    //     KdTreeST<Integer> kdTree = new KdTreeST<>();
+    //     String filename = args[0];
+    //     In in = new In(filename);
+    //
+    //     // Insert points with associated values
+    //     for (int i = 0; !in.isEmpty(); i++) {
+    //         double x = in.readDouble();
+    //         double y = in.readDouble();
+    //         Point2D p = new Point2D(x, y);
+    //         kdTree.put(p, i);
+    //     }
+    //
+    //     // Check isEmpty() and size()
+    //     StdOut.println("Is the kd-tree empty? " + kdTree.isEmpty());
+    //     StdOut.println("Size of kd-tree: " + kdTree.size());
+    //
+    //     // Test contains()
+    //     StdOut.println(
+    //             "Does the kd-tree contain (0.7, 0.2)? " +
+    //             kdTree.contains(new Point2D(0.7, 0.2)));
+    //
+    //     // Test get()
+    //     StdOut.println(
+    //             "Value associated with (0.7, 0.2): " +
+    //             kdTree.get(new Point2D(0.7, 0.2)));
+    //
+    //     // Test range search
+    //     StdOut.println("Points within the rectangle [0.2, 0.2] x [0.8, 0.8]:");
+    //     for (Point2D p : kdTree.range(new RectHV(0.2, 0.2, 0.8, 0.8))) {
+    //         StdOut.println(p);
+    //     }
+    //
+    //     // Test nearest neighbor search
+    //     StdOut.println(
+    //             "Nearest neighbor to point (0.6, 0.6): " + 
+    //             kdTree.nearest(new Point2D(0.6, 0.6)));
+    // }
 }
