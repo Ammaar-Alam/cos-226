@@ -27,42 +27,9 @@ public class PointTest {
             kdTree.nearest(queryPoint);
         }
         double timeNearest = stopwatchNearest.elapsedTime();
-
-        StopwatchCPU stopwatchPut = new StopwatchCPU();
-        for (int i = 0; i < M; i++) {
-            Point2D queryPoint = new Point2D(StdRandom.uniformDouble(0.0, 1.0),
-                                             StdRandom.uniformDouble(0.0, 1.0));
-            kdTree.nearest(queryPoint);
-        }
-        double timePut = stopwatchPut.elapsedTime();
-
-        StopwatchCPU stopwatchContains = new StopwatchCPU();
-        for (int i = 0; i < M; i++) {
-            Point2D queryPoint = new Point2D(StdRandom.uniformDouble(0.0, 1.0),
-                                             StdRandom.uniformDouble(0.0, 1.0));
-            kdTree.nearest(queryPoint);
-        }
-        double timeContains = stopwatchContains.elapsedTime();
-
-        StopwatchCPU stopwatchRange = new StopwatchCPU();
-        for (int i = 0; i < M; i++) {
-            Point2D queryPoint = new Point2D(StdRandom.uniformDouble(0.0, 1.0),
-                                             StdRandom.uniformDouble(0.0, 1.0));
-            kdTree.nearest(queryPoint);
-        }
-        double timeRange = stopwatchRange.elapsedTime();
-
-
         double nearestCPS = M / timeNearest;
-        double putCPS = M / timePut;
-        double containsCPS = M / timeContains;
-        double rangeCPS = M / timeRange;
-        double sum = putCPS + containsCPS + rangeCPS + nearestCPS;
 
-        StdOut.println("put() calls per second: " + putCPS);
-        StdOut.println("contains() calls per second: " + containsCPS);
-        StdOut.println("range() calls per second: " + rangeCPS);
+        // StdOut.println("range() calls per second: " + rangeCPS);
         StdOut.println("nearest() calls per second: " + nearestCPS);
-        StdOut.println("Sum of all calls " + sum);
     }
 }

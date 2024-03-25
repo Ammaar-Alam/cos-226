@@ -56,9 +56,12 @@ public class KdTreeST<Value> {
 
     // put a new key value pair into the tree
     public void put(Point2D p, Value val) {
-        if (p == null || val == null) throw new IllegalArgumentException("arg to put() is null");
-        root = put(root, p, val, new RectHV(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY,
-                                            Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY),
+        if (p == null || val == null) throw new
+                IllegalArgumentException("arg to put() is null");
+        root = put(root, p, val, new RectHV(Double.NEGATIVE_INFINITY,
+                                            Double.NEGATIVE_INFINITY,
+                                            Double.POSITIVE_INFINITY,
+                                            Double.POSITIVE_INFINITY),
                    VERTICAL);
     }
 

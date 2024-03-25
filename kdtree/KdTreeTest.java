@@ -32,7 +32,7 @@ public class KdTreeTest {
         for (int i = 0; i < M; i++) {
             Point2D queryPoint = new Point2D(StdRandom.uniformDouble(0.0, 1.0),
                                              StdRandom.uniformDouble(0.0, 1.0));
-            kdTree.nearest(queryPoint);
+            kdTree.put(queryPoint, i);
         }
         double timePut = stopwatchPut.elapsedTime();
 
@@ -40,28 +40,28 @@ public class KdTreeTest {
         for (int i = 0; i < M; i++) {
             Point2D queryPoint = new Point2D(StdRandom.uniformDouble(0.0, 1.0),
                                              StdRandom.uniformDouble(0.0, 1.0));
-            kdTree.nearest(queryPoint);
+            kdTree.contains(queryPoint);
         }
         double timeContains = stopwatchContains.elapsedTime();
 
-        StopwatchCPU stopwatchRange = new StopwatchCPU();
-        for (int i = 0; i < M; i++) {
-            Point2D queryPoint = new Point2D(StdRandom.uniformDouble(0.0, 1.0),
-                                             StdRandom.uniformDouble(0.0, 1.0));
-            kdTree.nearest(queryPoint);
-        }
-        double timeRange = stopwatchRange.elapsedTime();
+        // StopwatchCPU stopwatchRange = new StopwatchCPU();
+        // for (int i = 0; i < M; i++) {
+        //     Point2D queryPoint = new Point2D(StdRandom.uniformDouble(0.0, 1.0),
+        //                                      StdRandom.uniformDouble(0.0, 1.0));
+        //     kdTree.range(queryPoint);
+        // }
+        // double timeRange = stopwatchRange.elapsedTime();
 
 
         double nearestCPS = M / timeNearest;
         double putCPS = M / timePut;
         double containsCPS = M / timeContains;
-        double rangeCPS = M / timeRange;
-        double sum = putCPS + containsCPS + rangeCPS + nearestCPS;
+        // double rangeCPS = M / timeRange;
+        double sum = putCPS + containsCPS + nearestCPS;
 
         StdOut.println("put() calls per second: " + putCPS);
         StdOut.println("contains() calls per second: " + containsCPS);
-        StdOut.println("range() calls per second: " + rangeCPS);
+        // StdOut.println("range() calls per second: " + rangeCPS);
         StdOut.println("nearest() calls per second: " + nearestCPS);
         StdOut.println("Sum of all calls " + sum);
     }
