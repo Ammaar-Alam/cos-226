@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StopwatchCPU;
@@ -7,7 +8,7 @@ import edu.princeton.cs.algs4.StopwatchCPU;
 public class KdTreeTest {
     public static void main(String[] args) {
         KdTreeST<Integer> kdTree = new KdTreeST<>();
-        int M = 1000000; // Number of nearest neighbor searches
+        int M = 10000; // # of tests
         String filename = args[0];
         In in = new In(filename);
 
@@ -44,24 +45,24 @@ public class KdTreeTest {
         }
         double timeContains = stopwatchContains.elapsedTime();
 
-        // StopwatchCPU stopwatchRange = new StopwatchCPU();
-        // for (int i = 0; i < M; i++) {
-        //     Point2D queryPoint = new Point2D(StdRandom.uniformDouble(0.0, 1.0),
-        //                                      StdRandom.uniformDouble(0.0, 1.0));
-        //     kdTree.range(queryPoint);
-        // }
-        // double timeRange = stopwatchRange.elapsedTime();
+        StopwatchCPU stopwatchRange = new StopwatchCPU();
+        // this range test is def not right lol
+        for (int i = 0; i < M; i++) {
+            RectHV rangeRect = new RectHV(0.0, 0.0, 0.5, 0.5);
+            kdTree.range(rangeRect);
+        }
+        double timeRange = stopwatchRange.elapsedTime();
 
 
         double nearestCPS = M / timeNearest;
         double putCPS = M / timePut;
         double containsCPS = M / timeContains;
-        // double rangeCPS = M / timeRange;
+        double rangeCPS = M / timeRange;
         double sum = putCPS + containsCPS + nearestCPS;
 
         StdOut.println("put() calls per second: " + putCPS);
         StdOut.println("contains() calls per second: " + containsCPS);
-        // StdOut.println("range() calls per second: " + rangeCPS);
+        StdOut.println("range() calls per second: " + rangeCPS);
         StdOut.println("nearest() calls per second: " + nearestCPS);
         StdOut.println("Sum of all calls " + sum);
     }
