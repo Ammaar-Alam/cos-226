@@ -8,7 +8,7 @@ import edu.princeton.cs.algs4.StopwatchCPU;
 public class KdTreeTest {
     public static void main(String[] args) {
         KdTreeST<Integer> kdTree = new KdTreeST<>();
-        int M = 10000; // # of tests
+        int M = 100000; // # of tests
         String filename = args[0];
         In in = new In(filename);
 
@@ -48,7 +48,11 @@ public class KdTreeTest {
         StopwatchCPU stopwatchRange = new StopwatchCPU();
         // this range test is def not right lol
         for (int i = 0; i < M; i++) {
-            RectHV rangeRect = new RectHV(0.0, 0.0, 0.5, 0.5);
+            double xmin = StdRandom.uniformDouble(0.0, 0.5);
+            double ymin = StdRandom.uniformDouble(0.0, 0.5);
+            double xmax = StdRandom.uniformDouble(xmin, 1.0);
+            double ymax = StdRandom.uniformDouble(ymin, 1.0);
+            RectHV rangeRect = new RectHV(xmin, ymin, xmax, ymax);
             kdTree.range(rangeRect);
         }
         double timeRange = stopwatchRange.elapsedTime();

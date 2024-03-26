@@ -61,9 +61,9 @@ Prune subtree if it can't contain a closer point
                  # calls to         /   CPU time     =   # calls to nearest()
                  client nearest()       (seconds)        per second
                 ------------------------------------------------------
-PointST:
+PointST:        2118.0647252146505  calls to nearest() per second
 
-KdTreeST:       527734.2836772314 calls to nearest() per second
+KdTreeST:       527734.2836772314   calls to nearest() per second
 
 (i made a test class to calculate that already, im not manually figuring out the
 individual components when i already have the final value)
