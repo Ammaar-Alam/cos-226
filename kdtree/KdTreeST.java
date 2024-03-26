@@ -1,3 +1,5 @@
+// version with leaderboard optimizations reverted
+
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.RectHV;
@@ -255,7 +257,7 @@ public class KdTreeST<Value> {
             StdOut.println(p);
         }
 
-        // testing nearest
+        // testing nearset
         Point2D nearestPoint = kdTree.nearest(new Point2D(0.5, 0.5));
         StdOut.println("Nearest point to (0.5, 0.5): " + nearestPoint);
 
