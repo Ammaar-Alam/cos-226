@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdIn;
@@ -20,10 +21,13 @@ public class ShortestCommonAncestor {
     private boolean isRootedDAG(Digraph G) {
         int roots = 0;
         for (int v = 0; v < G.V(); v++) {
-            // find vertices with no outgoing edges (potential roots)
             if (G.outdegree(v) == 0) roots++;
         }
-        return roots == 1; // Only one root should exist for a rooted DAG
+
+        DirectedCycle finder = new DirectedCycle(G);
+        if (finder.hasCycle()) return false;
+
+        return roots == 1;
     }
 
     // // depth-first search
@@ -108,7 +112,9 @@ public class ShortestCommonAncestor {
     private void validateSubset(Iterable<Integer> vertices) {
         if (vertices == null) throw new IllegalArgumentException("argument is null");
         int V = G.V();
-        for (int v : vertices) {
+        for (Integer v : vertices) {
+            if (v == null)
+                throw new IllegalArgumentException("subset contains null item");
             if (v < 0 || v >= V)
                 throw new IllegalArgumentException(
                         "vertex " + v + " is not between 0 and " + (V - 1));
