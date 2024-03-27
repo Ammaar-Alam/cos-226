@@ -4,15 +4,19 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class WordNet {
+    // changed to hashset for optimization
     private final Map<String, Set<Integer>> nounToSynsets; // noun to synset IDs
     private final Map<Integer, String> synsetToNouns;      // synset ID to nouns
     private final Digraph digraph;                         // underlying digraph
     private final ShortestCommonAncestor sca;              // pre-processed SCA
+    private Set<String> allNounsCache;                     // cache for nouns()
+
 
     // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms) {
@@ -74,7 +78,10 @@ public class WordNet {
 
     // returns all WordNet nouns
     public Iterable<String> nouns() {
-        return nounToSynsets.keySet();
+        if (allNounsCache == null) {
+            allNounsCache = new HashSet<>(nounToSynsets.keySet());
+        }
+        return allNounsCache;
     }
 
     // is the word a WordNet noun?
