@@ -5,193 +5,146 @@ import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class ShortestCommonAncestor {
-    private Digraph G;  // the digraph
+    private final Digraph digraph; // the digraph
 
     // constructor takes a rooted DAG as argument
-    public ShortestCommonAncestor(Digraph G) {
-        if (G == null) throw new
-                IllegalArgumentException("argument to constructor is null");
-        this.G = new Digraph(G);
-        if (!isRootedDAG(this.G)) throw new
-                IllegalArgumentException("input is not a rooted DAG");
-    }
-
-    // is the given digraph a rooted DAG?
-    private boolean isRootedDAG(Digraph G) {
+    public ShortestCommonAncestor(Digraph digraph) {
+        if (digraph == null) throw new IllegalArgumentException("digraph is null");
+        this.digraph = new Digraph(digraph);
+        DirectedCycle finder = new DirectedCycle(this.digraph);
+        if (finder.hasCycle())
+            throw new IllegalArgumentException("diagraph is not a DAG");
         int roots = 0;
-        for (int v = 0; v < G.V(); v++) {
-            if (G.outdegree(v) == 0) roots++;
+        for (int v = 0; v < digraph.V(); v++) {
+            if (digraph.outdegree(v) == 0) roots++;
         }
-
-        DirectedCycle finder = new DirectedCycle(G);
-        if (finder.hasCycle()) return false;
-
-        return roots == 1;
+        if (roots != 1)
+            throw new IllegalArgumentException("digraph is not a rooted DAG");
     }
-
-    // // depth-first search
-    // private void dfs(Digraph G, int v, boolean[] visited) {
-    //     visited[v] = true;
-    //     for (int w : G.adj(v)) {
-    //         if (!visited[w]) dfs(G, w, visited);
-    //     }
-    // }
 
     // length of shortest ancestral path between v and w
     public int length(int v, int w) {
         validateVertex(v);
         validateVertex(w);
-        CustomBFS vBFS = new CustomBFS(G, v);
-        CustomBFS wBFS = new CustomBFS(G, w);
-        return calculateLength(vBFS, wBFS);
+        return ancestorAndLength(new HashSet<>(Set.of(v)),
+                                 new HashSet<>(Set.of(w)))[1];
     }
 
     // a shortest common ancestor of vertices v and w
     public int ancestor(int v, int w) {
         validateVertex(v);
         validateVertex(w);
-        CustomBFS vBFS = new CustomBFS(G, v);
-        CustomBFS wBFS = new CustomBFS(G, w);
-        return calculateAncestor(vBFS, wBFS);
+        return ancestorAndLength(new HashSet<>(Set.of(v)),
+                                 new HashSet<>(Set.of(w)))[0];
     }
 
     // length of shortest ancestral path of vertex subsets A and B
     public int lengthSubset(Iterable<Integer> subsetA, Iterable<Integer> subsetB) {
+        if (subsetA == null || subsetB == null)
+            throw new IllegalArgumentException("input files cannot be null");
         validateSubset(subsetA);
         validateSubset(subsetB);
-        CustomBFS bfsA = new CustomBFS(G, subsetA);
-        CustomBFS bfsB = new CustomBFS(G, subsetB);
-        return calculateLength(bfsA, bfsB);
+        return ancestorAndLength(subsetA, subsetB)[1];
     }
 
     // a shortest common ancestor of vertex subsets A and B
     public int ancestorSubset(Iterable<Integer> subsetA, Iterable<Integer> subsetB) {
         validateSubset(subsetA);
         validateSubset(subsetB);
-        CustomBFS bfsA = new CustomBFS(G, subsetA);
-        CustomBFS bfsB = new CustomBFS(G, subsetB);
-        return calculateAncestor(bfsA, bfsB);
+        return ancestorAndLength(subsetA, subsetB)[0];
     }
 
-    private int calculateLength(CustomBFS bfs1, CustomBFS bfs2) {
-        int minDistance = Integer.MAX_VALUE;
-        for (int v = 0; v < G.V(); v++) {
-            if (bfs1.hasPathTo(v) && bfs2.hasPathTo(v)) {
-                int distance = bfs1.distTo(v) + bfs2.distTo(v);
-                minDistance = Math.min(minDistance, distance);
-            }
-        }
-        return minDistance;
+    // returns ancestor and length of the shortest ancestral path
+    private int[] ancestorAndLength(Iterable<Integer> subsetA,
+                                    Iterable<Integer> subsetB) {
+        AncestorBFS bfs = new AncestorBFS(digraph, subsetA, subsetB);
+        return new int[] { bfs.getAncestor(), bfs.getMinDistance() };
     }
 
-    private int calculateAncestor(CustomBFS bfs1, CustomBFS bfs2) {
-        int minDistance = Integer.MAX_VALUE;
-        int ancestor = -1;
-        for (int v = 0; v < G.V(); v++) {
-            if (bfs1.hasPathTo(v) && bfs2.hasPathTo(v)) {
-                int distance = bfs1.distTo(v) + bfs2.distTo(v);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    ancestor = v;
-                }
-            }
-        }
-        return ancestor;
-    }
-
-    // throw an IllegalArgumentException if vertex v is not between 0 and V-1
+    // validates vertex
     private void validateVertex(int v) {
-        if (v < 0 || v >= G.V())
+        if (v < 0 || v >= digraph.V())
             throw new IllegalArgumentException(
-                    "vertex " + v + " is not between 0 and " + (G.V() - 1));
+                    "vertex " + v + " is not between 0 and " + (digraph.V() - 1));
     }
 
-    // throw an IllegalArgumentException if vertices is null, has zero vertices,
-    // or has a vertex that is not between 0 and V-1
+    // validates vertesx subset
     private void validateSubset(Iterable<Integer> vertices) {
-        if (vertices == null) throw new IllegalArgumentException("argument is null");
-        int V = G.V();
+        if (vertices == null) throw new IllegalArgumentException("Argument is null");
+        if (!vertices.iterator().hasNext())
+            throw new IllegalArgumentException("Subset is empty");
         for (Integer v : vertices) {
             if (v == null)
-                throw new IllegalArgumentException("subset contains null item");
-            if (v < 0 || v >= V)
-                throw new IllegalArgumentException(
-                        "vertex " + v + " is not between 0 and " + (V - 1));
+                throw new IllegalArgumentException("Subset contains null item");
+            validateVertex(v);
         }
-        if (!vertices.iterator().hasNext())
-            throw new IllegalArgumentException("subset is empty");
     }
 
-    private class CustomBFS {
-        private boolean[] marked;  // is there a path from source to v?
-        private int[] distTo;      // length of shortest path from source to v
-        private int[] edgeTo;      // last edge on shortest path from source to v
+    private class AncestorBFS {
+        // dist from subset A to each vertex
+        private final Map<Integer, Integer> distToA = new HashMap<>();
+        // dist from subset B to each vertex
+        private final Map<Integer, Integer> distToB = new HashMap<>();
+        // min dist found so far
+        private int minDistance = Integer.MAX_VALUE;
+        // ancestor corresponding to the min dist
+        private int ancestor = -1;
 
-        // Breadth-first search from a single source
-        private CustomBFS(Digraph G, int s) {
-            marked = new boolean[G.V()];
-            distTo = new int[G.V()];
-            edgeTo = new int[G.V()];
-            bfs(G, s);
-        }
+        // constructor
+        public AncestorBFS(Digraph digraph, Iterable<Integer> subsetA,
+                           Iterable<Integer> subsetB) {
+            bfs(digraph, subsetA, distToA);
+            bfs(digraph, subsetB, distToB);
 
-        // Breadth-first search from multiple sources
-        private CustomBFS(Digraph G, Iterable<Integer> sources) {
-            marked = new boolean[G.V()];
-            distTo = new int[G.V()];
-            edgeTo = new int[G.V()];
-            bfs(G, sources);
-        }
-
-        private void bfs(Digraph G, int s) {
-            for (int v = 0; v < G.V(); v++) distTo[v] = Integer.MAX_VALUE;
-            distTo[s] = 0;
-            marked[s] = true;
-            Queue<Integer> q = new Queue<>();
-            q.enqueue(s);
-            while (!q.isEmpty()) {
-                int v = q.dequeue();
-                for (int w : G.adj(v)) {
-                    if (!marked[w]) {
-                        edgeTo[w] = v;
-                        distTo[w] = distTo[v] + 1;
-                        marked[w] = true;
-                        q.enqueue(w);
+            for (Integer common : distToA.keySet()) {
+                if (distToB.containsKey(common)) {
+                    int totalDist = distToA.get(common) + distToB.get(common);
+                    if (totalDist < minDistance) {
+                        minDistance = totalDist;
+                        ancestor = common;
                     }
                 }
             }
         }
 
-        private void bfs(Digraph G, Iterable<Integer> sources) {
-            for (int v = 0; v < G.V(); v++) distTo[v] = Integer.MAX_VALUE;
-            for (int s : sources) {
-                distTo[s] = 0;
-                marked[s] = true;
-            }
+        // breadth-first search
+        private void bfs(Digraph d, Iterable<Integer> sources,
+                         Map<Integer, Integer> distTo) {
             Queue<Integer> q = new Queue<>();
             for (int s : sources) {
+                distTo.put(s, 0);
                 q.enqueue(s);
             }
             while (!q.isEmpty()) {
                 int v = q.dequeue();
-                for (int w : G.adj(v)) {
-                    if (!marked[w]) {
-                        edgeTo[w] = v;
-                        distTo[w] = distTo[v] + 1;
-                        marked[w] = true;
+                for (int w : d.adj(v)) {
+                    if (!distTo.containsKey(w)) {
+                        distTo.put(w, distTo.get(v) + 1);
                         q.enqueue(w);
                     }
                 }
             }
         }
 
-        private boolean hasPathTo(int v) {
-            return marked[v];
+        // returns min dist
+        public int getMinDistance() {
+            if (minDistance == Integer.MAX_VALUE) {
+                return -1;
+            }
+            else {
+                return minDistance;
+            }
         }
 
-        private int distTo(int v) {
-            return distTo[v];
+        // returns ancestor of min dist
+        public int getAncestor() {
+            return ancestor;
         }
     }
 
@@ -206,6 +159,10 @@ public class ShortestCommonAncestor {
             int length = sca.length(v, w);
             int ancestor = sca.ancestor(v, w);
             StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
+            int lengthSubset = sca.lengthSubset(Set.of(v), Set.of(w));
+            int ancestorSubset = sca.ancestorSubset(Set.of(v), Set.of(w));
+            StdOut.printf("lengthSubset = %d, ancestorSubset = %d\n",
+                          lengthSubset, ancestorSubset);
         }
     }
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WordNetBenchmark {
-    private static final int NUM_ITERATIONS = 10000;
+    private static final int NUM_ITERATIONS = 100000;
 
     public static void main(String[] args) {
         WordNet wordnet = new WordNet(args[0], args[1]);
