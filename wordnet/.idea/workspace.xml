@@ -32,7 +32,6 @@
   <component name="FindBugs-IDEA-Workspace">
     <analyzeAfterCompile>true</analyzeAfterCompile>
     <toolWindowToFront>false</toolWindowToFront>
-    <toolWindowEditorPreview>false</toolWindowEditorPreview>
   </component>
   <component name="FormatOnSaveOptions">
     <option name="myRunOnSave" value="true" />
