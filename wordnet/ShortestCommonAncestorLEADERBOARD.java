@@ -13,6 +13,7 @@ import java.util.Set;
 
 public class ShortestCommonAncestor {
     private final Digraph digraph; // the digraph
+    // cache for ancestor and length calculations
     private final Map<VertexPair, int[]> cache = new HashMap<>();
 
     // constructor takes a rooted DAG as argument
@@ -20,30 +21,26 @@ public class ShortestCommonAncestor {
         if (digraph == null) throw new IllegalArgumentException("digraph is null");
         this.digraph = new Digraph(digraph);
         DirectedCycle finder = new DirectedCycle(this.digraph);
-        if (finder.hasCycle())
-            throw new IllegalArgumentException("diagraph is not a DAG");
+        if (finder.hasCycle()) throw new IllegalArgumentException("diagraph is not a DAG");
         int roots = 0;
         for (int v = 0; v < digraph.V(); v++) {
             if (digraph.outdegree(v) == 0) roots++;
         }
-        if (roots != 1)
-            throw new IllegalArgumentException("digraph is not a rooted DAG");
+        if (roots != 1) throw new IllegalArgumentException("digraph is not a rooted DAG");
     }
 
     // length of shortest ancestral path between v and w
     public int length(int v, int w) {
         validateVertex(v);
         validateVertex(w);
-        return ancestorAndLength(new HashSet<>(Set.of(v)),
-                                 new HashSet<>(Set.of(w)))[1];
+        return ancestorAndLength(new HashSet<>(Set.of(v)), new HashSet<>(Set.of(w)))[1];
     }
 
     // a shortest common ancestor of vertices v and w
     public int ancestor(int v, int w) {
         validateVertex(v);
         validateVertex(w);
-        return ancestorAndLength(new HashSet<>(Set.of(v)),
-                                 new HashSet<>(Set.of(w)))[0];
+        return ancestorAndLength(new HashSet<>(Set.of(v)), new HashSet<>(Set.of(w)))[0];
     }
 
     // length of shortest ancestral path of vertex subsets A and B
@@ -71,13 +68,13 @@ public class ShortestCommonAncestor {
             return cache.get(pair);
         }
         AncestorBFS bfs = new AncestorBFS(digraph, setA, setB);
-        int[] result = new int[] { bfs.getAncestor(), bfs.getMinDistance() };
+        int[] result = { bfs.getAncestor(), bfs.getMinDistance() };
         cache.put(pair, result);
         return result;
     }
 
+    // converts iterable to set
     private Set<Integer> iterableToSet(Iterable<Integer> iterable) {
-        if (iterable instanceof Set) return (Set<Integer>) iterable;
         Set<Integer> resultSet = new HashSet<>();
         iterable.forEach(resultSet::add);
         return resultSet;
@@ -85,9 +82,10 @@ public class ShortestCommonAncestor {
 
     // validates vertex
     private void validateVertex(int v) {
-        if (v < 0 || v >= digraph.V())
+        if (v < 0 || v >= digraph.V()) {
             throw new IllegalArgumentException(
                     "vertex " + v + " is not between 0 and " + (digraph.V() - 1));
+        }
     }
 
     // validates vertesx subset
@@ -112,7 +110,6 @@ public class ShortestCommonAncestor {
         // ancestor corresponding to the min dist
         private int ancestor = -1;
 
-        // constructor
         public AncestorBFS(Digraph digraph, Iterable<Integer> subsetA,
                            Iterable<Integer> subsetB) {
             bfs(digraph, subsetA, distToA);
@@ -129,7 +126,6 @@ public class ShortestCommonAncestor {
             }
         }
 
-        // breadth-first search
         private void bfs(Digraph d, Iterable<Integer> sources,
                          Map<Integer, Integer> distTo) {
             Queue<Integer> q = new Queue<>();
@@ -148,23 +144,44 @@ public class ShortestCommonAncestor {
             }
         }
 
-        // returns min dist
         public int getMinDistance() {
-            if (minDistance == Integer.MAX_VALUE) {
-                return -1;
-            }
-            else {
-                return minDistance;
-            }
+            return minDistance == Integer.MAX_VALUE ? -1 : minDistance;
         }
 
-        // returns ancestor of min dist
         public int getAncestor() {
             return ancestor;
         }
     }
 
-    // unit testing (required)
+    private class VertexPair {
+        // vertices of subset A
+        private final Set<Integer> vertexSetA;
+        // vertices of subset B
+        private final Set<Integer> vertexSetB;
+
+        // constructor creates a pair from two subsets
+        public VertexPair(Set<Integer> vertexSetA, Set<Integer> vertexSetB) {
+            this.vertexSetA = vertexSetA;
+            this.vertexSetB = vertexSetB;
+        }
+
+        // checks if two VertexPairs are equal
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            VertexPair that = (VertexPair) obj;
+            return Objects.equals(vertexSetA, that.vertexSetA) &&
+                    Objects.equals(vertexSetB, that.vertexSetB);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(vertexSetA, vertexSetB);
+        }
+    }
+
+    // unit testing
     public static void main(String[] args) {
         In in = new In(args[0]);
         Digraph G = new Digraph(in);
@@ -179,30 +196,6 @@ public class ShortestCommonAncestor {
             int ancestorSubset = sca.ancestorSubset(Set.of(v), Set.of(w));
             StdOut.printf("lengthSubset = %d, ancestorSubset = %d\n",
                           lengthSubset, ancestorSubset);
-        }
-    }
-
-    class VertexPair {
-        private final Set<Integer> vertexSetA;
-        private final Set<Integer> vertexSetB;
-
-        public VertexPair(Set<Integer> vertexSetA, Set<Integer> vertexSetB) {
-            this.vertexSetA = vertexSetA;
-            this.vertexSetB = vertexSetB;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof VertexPair)) return false;
-            VertexPair that = (VertexPair) o;
-            return Objects.equals(vertexSetA, that.vertexSetA) &&
-                    Objects.equals(vertexSetB, that.vertexSetB);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(vertexSetA, vertexSetB);
         }
     }
 }
