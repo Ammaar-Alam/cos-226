@@ -16,7 +16,7 @@ Programming Assignment 5:  WordNet
  ******************************************************************************/
 
 [write the dates and help received here]
-
+03/27/24    ChatGPT & GitHub Copilot    Help brainstorming ways to optimize code
 
 /******************************************************************************
  *  Write and sign the following student acknowledgment of original work.

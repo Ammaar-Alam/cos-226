@@ -1,6 +1,7 @@
 // contains a better optimized version involving caching for the leaderboard
 // made a separate version since i couldn't be bothered to fix all the checkstyle
 // errors/format it to pass all the course checkstyle requirements
+
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
@@ -14,13 +15,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class ShortestCommonAncestor {
+public class ShortestCommonAncestorLEADERBOARD {
     private final Digraph digraph; // the digraph
     // cache for ancestor and length calculations
     private final Map<VertexPair, int[]> cache = new HashMap<>();
 
     // constructor takes a rooted DAG as argument
-    public ShortestCommonAncestor(Digraph digraph) {
+    public ShortestCommonAncestorLEADERBOARD(Digraph digraph) {
         if (digraph == null) throw new IllegalArgumentException("digraph is null");
         this.digraph = new Digraph(digraph);
         DirectedCycle finder = new DirectedCycle(this.digraph);
