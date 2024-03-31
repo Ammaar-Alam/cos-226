@@ -1,3 +1,6 @@
+// contains a better optimized version involving caching for the leaderboard
+// made a separate version since i couldn't be bothered to fix all the checkstyle
+// errors/format it to pass all the course checkstyle requirements
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
