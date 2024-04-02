@@ -93,10 +93,10 @@ Most of the dependencies that I used are contained within the course's algs4.jar
       </a>
     </td>
     <td>
-      <div align="center"> TBD </div>
+      <div align="center"> Build a <a href="https://wordnet.princeton.edu"> WordNet </a> object with built-in search methods  </div>
     </td>
     <td>
-      <div align="center"> TBD </div>
+      <div align="center"> hash tables, depth-first search, breadth-first search, topological sort, minimum spanning trees, Kruskal's algorithm, Prim's algorithm </div>
     </td>
   </tr>
    <tr>
