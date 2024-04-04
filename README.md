@@ -105,7 +105,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
         <a href=""> Seam Carving </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/seam/specification.php">
-        <img src="./Assignment6/src/resources/logo.png" width = 300>
+        <img src="seamcarving/logo.png" width = 300>
       </a>
     </td>
     <td>
