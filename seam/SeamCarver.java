@@ -7,6 +7,7 @@ public class SeamCarver {
     private Picture picture;    // current picture
     private int width;          // width of current picture
     private int height;         // height of current picture
+    private double[][] energyArray; // energy array of current picture
 
     // create a seam carver object based on the given picture
     public SeamCarver(Picture picture) {
@@ -16,6 +17,20 @@ public class SeamCarver {
         this.picture = new Picture(picture);
         this.width = picture.width();
         this.height = picture.height();
+        this.energyArray = calculateEnergyArray();
+    }
+
+    // calculate the energy array for the current picture
+    private double[][] calculateEnergyArray() {
+        double[][] energyArray = new double[height][width];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                energyArray[y][x] = energy(x, y);
+            }
+        }
+
+        return energyArray;
     }
 
     // current picture
@@ -25,12 +40,12 @@ public class SeamCarver {
 
     // width of current picture
     public int width() {
-        return this.width;
+        return width;
     }
 
     // height of current picture
     public int height() {
-        return this.height;
+        return height;
     }
 
     // energy of pixel at column x and row y
@@ -98,20 +113,34 @@ public class SeamCarver {
 
     // generic energy computation
     private double computeEnergy(int x, int y, int lx, int rx, int uy, int dy) {
-        int rgbXLeft = picture.getRGB(lx, y);
-        int rgbXRight = picture.getRGB(rx, y);
-        int rgbYUp = picture.getRGB(x, uy);
-        int rgbYDown = picture.getRGB(x, dy);
+        int rgbLeft = picture.getRGB(lx, y);
+        int rgbRight = picture.getRGB(rx, y);
+        int rgbUp = picture.getRGB(x, uy);
+        int rgbDown = picture.getRGB(x, dy);
 
-        int rxDiff = ((rgbXLeft >> 16) & 0xFF) - ((rgbXRight >> 16) & 0xFF);
-        int gxDiff = ((rgbXLeft >> 8) & 0xFF) - ((rgbXRight >> 8) & 0xFF);
-        int bxDiff = (rgbXLeft & 0xFF) - (rgbXRight & 0xFF);
-        int xGradSquare = rxDiff * rxDiff + gxDiff * gxDiff + bxDiff * bxDiff;
+        int rLeft = (rgbLeft >> 16) & 0xFF;
+        int gLeft = (rgbLeft >> 8) & 0xFF;
+        int bLeft = rgbLeft & 0xFF;
 
-        int ryDiff = ((rgbYUp >> 16) & 0xFF) - ((rgbYDown >> 16) & 0xFF);
-        int gyDiff = ((rgbYUp >> 8) & 0xFF) - ((rgbYDown >> 8) & 0xFF);
-        int byDiff = (rgbYUp & 0xFF) - (rgbYDown & 0xFF);
-        int yGradSquare = ryDiff * ryDiff + gyDiff * gyDiff + byDiff * byDiff;
+        int rRight = (rgbRight >> 16) & 0xFF;
+        int gRight = (rgbRight >> 8) & 0xFF;
+        int bRight = rgbRight & 0xFF;
+
+        int rUp = (rgbUp >> 16) & 0xFF;
+        int gUp = (rgbUp >> 8) & 0xFF;
+        int bUp = rgbUp & 0xFF;
+
+        int rDown = (rgbDown >> 16) & 0xFF;
+        int gDown = (rgbDown >> 8) & 0xFF;
+        int bDown = rgbDown & 0xFF;
+
+        int xGradSquare = (rLeft - rRight) * (rLeft - rRight) +
+                (gLeft - gRight) * (gLeft - gRight) +
+                (bLeft - bRight) * (bLeft - bRight);
+
+        int yGradSquare = (rUp - rDown) * (rUp - rDown) +
+                (gUp - gDown) * (gUp - gDown) +
+                (bUp - bDown) * (bUp - bDown);
 
         return Math.sqrt(xGradSquare + yGradSquare);
     }
@@ -122,7 +151,7 @@ public class SeamCarver {
         int[][] edgeTo = new int[width][height];
 
         for (int col = 0; col < width; col++) {
-            distTo[col][0] = energy(col, 0);
+            distTo[col][0] = energyArray[0][col];
         }
 
         for (int row = 1; row < height; row++) {
@@ -130,19 +159,18 @@ public class SeamCarver {
                 double minDist = Double.POSITIVE_INFINITY;
                 int minCol = -1;
 
-                if (col > 0 && distTo[col - 1][row - 1] + energy(col, row) < minDist) {
-                    minDist = distTo[col - 1][row - 1] + energy(col, row);
+                if (col > 0 && distTo[col - 1][row - 1] + energyArray[row][col] < minDist) {
+                    minDist = distTo[col - 1][row - 1] + energyArray[row][col];
                     minCol = col - 1;
                 }
 
-                if (distTo[col][row - 1] + energy(col, row) < minDist) {
-                    minDist = distTo[col][row - 1] + energy(col, row);
+                if (distTo[col][row - 1] + energyArray[row][col] < minDist) {
+                    minDist = distTo[col][row - 1] + energyArray[row][col];
                     minCol = col;
                 }
 
-                if (col < width - 1 && distTo[col + 1][row - 1] +
-                        energy(col, row) < minDist) {
-                    minDist = distTo[col + 1][row - 1] + energy(col, row);
+                if (col < width - 1 && distTo[col + 1][row - 1] + energyArray[row][col] < minDist) {
+                    minDist = distTo[col + 1][row - 1] + energyArray[row][col];
                     minCol = col + 1;
                 }
 
@@ -184,7 +212,7 @@ public class SeamCarver {
         return seam;
     }
 
-    // transpose the picture
+    // transpose the picture and energy array
     private void transpose() {
         Picture transposedPic = new Picture(height, width);
 
@@ -195,9 +223,23 @@ public class SeamCarver {
         }
 
         picture = transposedPic;
+        energyArray = transposeEnergyArray();
         int temp = width;
         width = height;
         height = temp;
+    }
+
+    // transpose the energy array
+    private double[][] transposeEnergyArray() {
+        double[][] transposedEnergyArray = new double[width][height];
+
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                transposedEnergyArray[col][row] = energyArray[row][col];
+            }
+        }
+
+        return transposedEnergyArray;
     }
 
     // remove horizontal seam from current picture
@@ -216,6 +258,7 @@ public class SeamCarver {
 
         picture = newPicture;
         height--;
+        energyArray = calculateEnergyArray();
     }
 
     // remove vertical seam from current picture
@@ -234,6 +277,7 @@ public class SeamCarver {
 
         picture = newPicture;
         width--;
+        energyArray = calculateEnergyArray();
     }
 
     // validate seam
