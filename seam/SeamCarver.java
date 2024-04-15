@@ -6,8 +6,8 @@ import java.util.Arrays;
 public class SeamCarver {
     private Picture picture;    // current picture
     private int width;          // width of current picture
-    private int height;         // height of current picture
-    private double[][] energyArray; // energy array of current picture
+    private int height;         // width of current picture
+    private double[][] energyGrid; // cache for energy calculations
 
     // create a seam carver object based on the given picture
     public SeamCarver(Picture picture) {
@@ -17,35 +17,28 @@ public class SeamCarver {
         this.picture = new Picture(picture);
         this.width = picture.width();
         this.height = picture.height();
-        this.energyArray = calculateEnergyArray();
-    }
-
-    // calculate the energy array for the current picture
-    private double[][] calculateEnergyArray() {
-        double[][] energyArray = new double[height][width];
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                energyArray[y][x] = energy(x, y);
-            }
-        }
-
-        return energyArray;
+        computeEnergyGrid();
     }
 
     // current picture
     public Picture picture() {
-        return new Picture(picture);
+        Picture newPicture = new Picture(width, height);
+        for (int col = 0; col < width; col++) {
+            for (int row = 0; row < height; row++) {
+                newPicture.setRGB(col, row, picture.getRGB(col, row));
+            }
+        }
+        return newPicture;
     }
 
     // width of current picture
     public int width() {
-        return width;
+        return this.width;
     }
 
     // height of current picture
     public int height() {
-        return height;
+        return this.height;
     }
 
     // energy of pixel at column x and row y
@@ -55,48 +48,30 @@ public class SeamCarver {
         if (y < 0 || y >= height)
             throw new IllegalArgumentException();
 
-        if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-            return computeBorderPixelEnergy(x, y);
-        }
-        else {
-            return computeInnerPixelEnergy(x, y);
+        return energyGrid[x][y];
+    }
+
+    // compute energy grid
+    private void computeEnergyGrid() {
+        energyGrid = new double[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+                    energyGrid[x][y] = computeBorderPixelEnergy(x, y);
+                }
+                else {
+                    energyGrid[x][y] = computeInnerPixelEnergy(x, y);
+                }
+            }
         }
     }
 
     // compute energy for border pixels
     private double computeBorderPixelEnergy(int x, int y) {
-        int lx;
-        int rx;
-        int uy;
-        int dy;
-
-        if (x == 0) {
-            lx = width - 1;
-        }
-        else {
-            lx = x - 1;
-        }
-
-        if (x == width - 1) {
-            rx = 0;
-        }
-        else {
-            rx = x + 1;
-        }
-
-        if (y == 0) {
-            uy = height - 1;
-        }
-        else {
-            uy = y - 1;
-        }
-
-        if (y == height - 1) {
-            dy = 0;
-        }
-        else {
-            dy = y + 1;
-        }
+        int lx = x == 0 ? width - 1 : x - 1;
+        int rx = x == width - 1 ? 0 : x + 1;
+        int uy = y == 0 ? height - 1 : y - 1;
+        int dy = y == height - 1 ? 0 : y + 1;
 
         return computeEnergy(x, y, lx, rx, uy, dy);
     }
@@ -113,34 +88,20 @@ public class SeamCarver {
 
     // generic energy computation
     private double computeEnergy(int x, int y, int lx, int rx, int uy, int dy) {
-        int rgbLeft = picture.getRGB(lx, y);
-        int rgbRight = picture.getRGB(rx, y);
-        int rgbUp = picture.getRGB(x, uy);
-        int rgbDown = picture.getRGB(x, dy);
+        int rgbXLeft = picture.getRGB(lx, y);
+        int rgbXRight = picture.getRGB(rx, y);
+        int rgbYUp = picture.getRGB(x, uy);
+        int rgbYDown = picture.getRGB(x, dy);
 
-        int rLeft = (rgbLeft >> 16) & 0xFF;
-        int gLeft = (rgbLeft >> 8) & 0xFF;
-        int bLeft = rgbLeft & 0xFF;
+        int rxDiff = ((rgbXLeft >> 16) & 0xFF) - ((rgbXRight >> 16) & 0xFF);
+        int gxDiff = ((rgbXLeft >> 8) & 0xFF) - ((rgbXRight >> 8) & 0xFF);
+        int bxDiff = (rgbXLeft & 0xFF) - (rgbXRight & 0xFF);
+        int xGradSquare = rxDiff * rxDiff + gxDiff * gxDiff + bxDiff * bxDiff;
 
-        int rRight = (rgbRight >> 16) & 0xFF;
-        int gRight = (rgbRight >> 8) & 0xFF;
-        int bRight = rgbRight & 0xFF;
-
-        int rUp = (rgbUp >> 16) & 0xFF;
-        int gUp = (rgbUp >> 8) & 0xFF;
-        int bUp = rgbUp & 0xFF;
-
-        int rDown = (rgbDown >> 16) & 0xFF;
-        int gDown = (rgbDown >> 8) & 0xFF;
-        int bDown = rgbDown & 0xFF;
-
-        int xGradSquare = (rLeft - rRight) * (rLeft - rRight) +
-                (gLeft - gRight) * (gLeft - gRight) +
-                (bLeft - bRight) * (bLeft - bRight);
-
-        int yGradSquare = (rUp - rDown) * (rUp - rDown) +
-                (gUp - gDown) * (gUp - gDown) +
-                (bUp - bDown) * (bUp - bDown);
+        int ryDiff = ((rgbYUp >> 16) & 0xFF) - ((rgbYDown >> 16) & 0xFF);
+        int gyDiff = ((rgbYUp >> 8) & 0xFF) - ((rgbYDown >> 8) & 0xFF);
+        int byDiff = (rgbYUp & 0xFF) - (rgbYDown & 0xFF);
+        int yGradSquare = ryDiff * ryDiff + gyDiff * gyDiff + byDiff * byDiff;
 
         return Math.sqrt(xGradSquare + yGradSquare);
     }
@@ -151,43 +112,45 @@ public class SeamCarver {
         int[][] edgeTo = new int[width][height];
 
         for (int col = 0; col < width; col++) {
-            distTo[col][0] = energyArray[0][col];
+            for (int row = 0; row < height; row++) {
+                if (row == 0) {
+                    distTo[col][row] = energy(col, row);
+                }
+                else {
+                    distTo[col][row] = Double.POSITIVE_INFINITY;
+                }
+            }
         }
 
-        for (int row = 1; row < height; row++) {
+        for (int row = 0; row < height - 1; row++) {
             for (int col = 0; col < width; col++) {
-                double minDist = Double.POSITIVE_INFINITY;
-                int minCol = -1;
-
-                if (col > 0 && distTo[col - 1][row - 1] + energyArray[row][col] < minDist) {
-                    minDist = distTo[col - 1][row - 1] + energyArray[row][col];
-                    minCol = col - 1;
+                if (col > 0) {
+                    relax(col, row, distTo, edgeTo, col - 1);
                 }
-
-                if (distTo[col][row - 1] + energyArray[row][col] < minDist) {
-                    minDist = distTo[col][row - 1] + energyArray[row][col];
-                    minCol = col;
+                relax(col, row, distTo, edgeTo, col);
+                if (col < width - 1) {
+                    relax(col, row, distTo, edgeTo, col + 1);
                 }
-
-                if (col < width - 1 && distTo[col + 1][row - 1] + energyArray[row][col] < minDist) {
-                    minDist = distTo[col + 1][row - 1] + energyArray[row][col];
-                    minCol = col + 1;
-                }
-
-                distTo[col][row] = minDist;
-                edgeTo[col][row] = minCol;
             }
         }
 
         return buildSeam(distTo, edgeTo);
     }
 
+    // relax the edge from pixel (row, col) to pixel (row + 1, nextCol)
+    private void relax(int col, int row, double[][] distTo, int[][] edgeTo,
+                       int nextCol) {
+        if (distTo[nextCol][row + 1] > distTo[col][row] + energy(nextCol, row + 1)) {
+            distTo[nextCol][row + 1] = distTo[col][row] + energy(nextCol, row + 1);
+            edgeTo[nextCol][row + 1] = col;
+        }
+    }
+
     // build vertical seam from edgeTo array
     private int[] buildSeam(double[][] distTo, int[][] edgeTo) {
         int[] seam = new int[height];
         double minDist = Double.POSITIVE_INFINITY;
-        int col = -1;
-
+        int col = 0;
         for (int i = 0; i < width; i++) {
             if (distTo[i][height - 1] < minDist) {
                 minDist = distTo[i][height - 1];
@@ -206,40 +169,27 @@ public class SeamCarver {
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        transpose();
+        double[][] originalEnergyGrid = energyGrid;
+        transposeEnergyGrid();
         int[] seam = findVerticalSeam();
-        transpose();
+        energyGrid = originalEnergyGrid;
+        width = energyGrid.length;
+        height = energyGrid[0].length;
         return seam;
     }
 
-    // transpose the picture and energy array
-    private void transpose() {
-        Picture transposedPic = new Picture(height, width);
-
+    // transpose the energy grid
+    private void transposeEnergyGrid() {
+        double[][] transposedEnergyGrid = new double[height][width];
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                transposedPic.setRGB(row, col, picture.getRGB(col, row));
+                transposedEnergyGrid[row][col] = energyGrid[col][row];
             }
         }
-
-        picture = transposedPic;
-        energyArray = transposeEnergyArray();
+        energyGrid = transposedEnergyGrid;
         int temp = width;
         width = height;
         height = temp;
-    }
-
-    // transpose the energy array
-    private double[][] transposeEnergyArray() {
-        double[][] transposedEnergyArray = new double[width][height];
-
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                transposedEnergyArray[col][row] = energyArray[row][col];
-            }
-        }
-
-        return transposedEnergyArray;
     }
 
     // remove horizontal seam from current picture
@@ -256,9 +206,9 @@ public class SeamCarver {
             }
         }
 
-        picture = newPicture;
-        height--;
-        energyArray = calculateEnergyArray();
+        this.picture = newPicture;
+        this.height--;
+        computeEnergyGrid();
     }
 
     // remove vertical seam from current picture
@@ -275,9 +225,9 @@ public class SeamCarver {
             }
         }
 
-        picture = newPicture;
-        width--;
-        energyArray = calculateEnergyArray();
+        this.picture = newPicture;
+        this.width--;
+        computeEnergyGrid();
     }
 
     // validate seam
