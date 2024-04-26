@@ -121,7 +121,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
         <a href=""> Fraud Detection </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/fraud/specification.php">
-        <img src="fraud/logo.png" width = 300>
+        <img src="fraud/fraud.png" width = 300>
       </a>
     </td>
     <td>
