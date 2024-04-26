@@ -22,7 +22,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
   <tr>
     <td>
      <div align="center">
-       <a href=""> Percolation </a>
+       <a href="/percolation"> Percolation </a>
      </div>
      <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/percolation/specification.php">
        <img src="percolation/logo.png" width = 300>
@@ -38,7 +38,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
   <tr>
     <td>
       <div align="center">
-        <a href=""> Queues </a>
+        <a href="/queues"> Queues </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/queues/specification.php">
         <img src="queues/logo.png" width = 400>
@@ -54,7 +54,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
    <tr>
     <td>
       <div align="center">
-        <a href=""> Autocomplete </a>
+        <a href="/autocomplete"> Autocomplete </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/autocomplete/specification.php">
         <img src="autocomplete/logo.png" width = 300>
@@ -70,7 +70,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
    <tr>
     <td>
       <div align="center">
-        <a href=""> KD Trees </a>
+        <a href="kdtree"> KD Trees </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/kdtree/specification.php">
         <img src="kdtree/logo.png" width = 300>
@@ -86,7 +86,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
    <tr>
     <td>
       <div align="center">
-        <a href="https://github.com/Ammaar-Alam/cos-226/tree/main/wordnet"> WordNet </a>
+        <a href="/wordnet"> WordNet </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/wordnet/specification.php">
         <img src="wordnet/logo.png" width = 300>
@@ -102,7 +102,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
    <tr>
     <td>
       <div align="center">
-        <a href=""> Seam Carving </a>
+        <a href="/seam"> Seam Carving </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/seam/specification.php">
         <img src="seam/logo.png" width = 300>
@@ -118,7 +118,7 @@ Most of the dependencies that I used are contained within the course's algs4.jar
    <tr>
     <td>
       <div align="center">
-        <a href=""> Fraud Detection </a>
+        <a href="/fraud"> Fraud Detection </a>
       </div>
       <a href="https://www.cs.princeton.edu/courses/archive/spring24/cos226/assignments/fraud/specification.php">
         <img src="fraud/fraud.png" width = 300>
