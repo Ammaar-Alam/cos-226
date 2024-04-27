@@ -15,10 +15,15 @@ public class BoostingAlgorithm {
     public BoostingAlgorithm(int[][] input, int[] labels, Point2D[] locations, int k) {
         if (input == null || labels == null || locations == null)
             throw new IllegalArgumentException("Null arguments not allowed");
-        if (input.length != labels.length || input.length != locations.length)
-            throw new IllegalArgumentException("Input lengths do not match");
-        if (k < 1 || k > input.length)
+        if (input.length != labels.length)
+            throw new IllegalArgumentException("Input and labels lengths do not match");
+        if (k < 1 || k > locations.length)
             throw new IllegalArgumentException("Invalid number of clusters");
+
+        for (int label : labels) {
+            if (label != 0 && label != 1)
+                throw new IllegalArgumentException("Labels must be either 0 or 1");
+        }
 
         int n = input.length;
         clustering = new Clustering(locations, k);
@@ -48,8 +53,7 @@ public class BoostingAlgorithm {
 
         double weightSum = 0;
         for (int i = 0; i < weights.length; i++) {
-            int prediction = learner.predict(reducedInput[i]);
-            if (prediction != labels[i])
+            if (learner.predict(reducedInput[i]) != labels[i])
                 weights[i] *= 2;
             weightSum += weights[i];
         }
