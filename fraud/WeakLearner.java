@@ -80,8 +80,6 @@ public class WeakLearner {
     public int predict(int[] sample) {
         if (sample == null)
             throw new IllegalArgumentException("Null argument not allowed");
-        if (sample.length != dp + 1)
-            throw new IllegalArgumentException("Sample dimension does not match");
 
         if (sp == 0)
             return (sample[dp] <= vp) ? 1 : 0;
