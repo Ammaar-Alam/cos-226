@@ -86,6 +86,7 @@ public class BoostingAlgorithm {
         return (ones >= zeroes) ? 1 : 0;
     }
 
+
     // unit testing (required)
     public static void main(String[] args) {
         // read in the terms from a file
