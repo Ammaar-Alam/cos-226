@@ -28,5 +28,6 @@ Programming Assignment 7:  Fraud Detection
  ******************************************************************************/
 
 [write and sign the pledge here]
-
+ This programming assignment represents my own work in accordance
+ with University regulations.  /s/ Ammaar Alam
 

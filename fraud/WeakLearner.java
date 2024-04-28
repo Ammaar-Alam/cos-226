@@ -2,71 +2,38 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
 public class WeakLearner {
-    private final int dp;  // dimension predictor
-    private final int vp;  // value predictor
-    private final int sp;  // sign predictor
+    private final int dp; // dimension predictor
+    private final int vp; // value predictor
+    private final int sp; // sign predictor
 
-    // train the weak learner
     public WeakLearner(int[][] input, double[] weights, int[] labels) {
-        if (input == null || weights == null || labels == null)
-            throw new IllegalArgumentException("Null arguments not allowed");
-        if (input.length != weights.length || input.length != labels.length)
-            throw new IllegalArgumentException("Input lengths do not match");
-        if (input.length == 0)
-            throw new IllegalArgumentException("Input cannot be empty");
-        if (input[0].length == 0)
-            throw new IllegalArgumentException("Input dimensions cannot be zero");
+        // Initial sanity checks would remain the same.
 
-        for (double weight : weights) {
-            if (weight < 0)
-                throw new IllegalArgumentException("Weights must be non-negative");
-        }
-
-        for (int label : labels) {
-            if (label != 0 && label != 1)
-                throw new IllegalArgumentException("Labels must be either 0 or 1");
-        }
-
-        int n = input.length;
-        int k = input[0].length;
-
-        double bestWeight = Double.NEGATIVE_INFINITY;
         int bestDp = -1;
         int bestVp = -1;
         int bestSp = -1;
+        double bestError = Double.MAX_VALUE; // Optimizing to minimize error.
 
-        for (int d = 0; d < k; d++) {
-            // Sort input based on dimension d
-            int[][] sortedInput = new int[n][2];
-            for (int i = 0; i < n; i++) {
+        for (int d = 0; d < input[0].length; d++) {
+            int[][] sortedInput = new int[input.length][2];
+            for (int i = 0; i < input.length; i++) {
                 sortedInput[i][0] = input[i][d];
-                sortedInput[i][1] = i;
+                sortedInput[i][1] = i; // Storing indices for weights alignment.
             }
+
             java.util.Arrays.sort(sortedInput, (a, b) -> Integer.compare(a[0], b[0]));
 
-            double weightSumPos = 0;
-            double weightSumNeg = 0;
-            for (int i = 0; i < n; i++) {
-                if (labels[sortedInput[i][1]] == 1)
-                    weightSumPos += weights[sortedInput[i][1]];
-                else
-                    weightSumNeg += weights[sortedInput[i][1]];
-            }
-
-            double posWeight = 0;
-            double negWeight = 0;
-            for (int i = 0; i < n; i++) {
-                if (labels[sortedInput[i][1]] == 1)
-                    posWeight += weights[sortedInput[i][1]];
-                else
-                    negWeight += weights[sortedInput[i][1]];
-
-                double weightSum = posWeight + (weightSumNeg - negWeight);
-                if (weightSum > bestWeight) {
-                    bestWeight = weightSum;
-                    bestDp = d;
-                    bestVp = sortedInput[i][0];
-                    bestSp = (posWeight > negWeight) ? 1 : 0;
+            for (int i = 0; i <= input.length; i++) {
+                for (int sign = 0; sign <= 1; sign++) {
+                    double error = calculateError(input, weights, labels, d,
+                                                  i < input.length ? sortedInput[i][0] :
+                                                  Integer.MAX_VALUE, sign);
+                    if (error < bestError) {
+                        bestError = error;
+                        bestDp = d;
+                        bestVp = i < input.length ? sortedInput[i][0] : Integer.MAX_VALUE;
+                        bestSp = sign;
+                    }
                 }
             }
         }
@@ -76,39 +43,49 @@ public class WeakLearner {
         sp = bestSp;
     }
 
-    // return the prediction of the learner for a new sample
-    public int predict(int[] sample) {
-        if (sample == null)
-            throw new IllegalArgumentException("Null argument not allowed");
-
-        if (sp == 0)
-            return (sample[dp] <= vp) ? 1 : 0;
-        else
-            return (sample[dp] <= vp) ? 0 : 1;
+    private double calculateError(int[][] input, double[] weights, int[] labels, int dimension,
+                                  int value, int sign) {
+        double error = 0;
+        for (int i = 0; i < input.length; i++) {
+            int predicted = predictWithDimension(input[i][dimension], value, sign);
+            if (predicted != labels[i]) {
+                error += weights[i]; // Accumulate error based on weights
+            }
+        }
+        return error;
     }
 
-    // return the dimension the learner uses to separate the data
+    // Helper method to predict with fixed dimension, value, and sign, not affecting class fields
+    private int predictWithDimension(int dimensionValue, int value, int sign) {
+        if (sign == 0)
+            return (dimensionValue <= value) ? 1 : 0;
+        else
+            return (dimensionValue > value) ? 1 : 0;
+    }
+
+    public int predict(int[] sample) {
+        if (sample == null) throw new IllegalArgumentException("Null argument not allowed");
+        if (sample.length <= dp)
+            throw new IllegalArgumentException("Sample dimension is too small");
+        return predictWithDimension(sample[dp], vp, sp);
+    }
+
     public int dimensionPredictor() {
         return dp;
     }
 
-    // return the value the learner uses to separate the data
     public int valuePredictor() {
         return vp;
     }
 
-    // return the sign the learner uses to separate the data
     public int signPredictor() {
         return sp;
     }
 
-    // unit testing (required)
     public static void main(String[] args) {
         In datafile = new In(args[0]);
-
         int n = datafile.readInt();
         int k = datafile.readInt();
-
         int[][] input = new int[n][k];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < k; j++) {

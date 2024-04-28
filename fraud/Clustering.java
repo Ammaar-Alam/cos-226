@@ -1,12 +1,13 @@
-import edu.princeton.cs.algs4.Point2D;
-import edu.princeton.cs.algs4.EdgeWeightedGraph;
-import edu.princeton.cs.algs4.Edge;
-import edu.princeton.cs.algs4.KruskalMST;
 import edu.princeton.cs.algs4.CC;
+import edu.princeton.cs.algs4.Edge;
+import edu.princeton.cs.algs4.EdgeWeightedGraph;
+import edu.princeton.cs.algs4.KruskalMST;
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.StdOut;
 
 public class Clustering {
-    private final int[] clusters;
-    private final int k;
+    private final int[] clusters;  // cluster assignments for each point
+    private final int k;           // number of clusters
 
     // run the clustering algorithm and create the clusters
     public Clustering(Point2D[] locations, int k) {
@@ -69,71 +70,78 @@ public class Clustering {
     // unit testing (required)
     public static void main(String[] args) {
         // Test case 1: Normal usage
-        Point2D[] locations = {
+        Point2D[] locations1 = {
                 new Point2D(0, 0),
                 new Point2D(1, 1),
                 new Point2D(2, 2),
                 new Point2D(3, 3),
                 new Point2D(4, 4)
         };
-        int k = 2;
-        Clustering clustering = new Clustering(locations, k);
+        int k1 = 2;
+        Clustering clustering1 = new Clustering(locations1, k1);
 
         // Test clusterOf method
-        System.out.println("Cluster assignments:");
-        for (int i = 0; i < locations.length; i++) {
-            System.out.println("Point " + i + ": Cluster " + clustering.clusterOf(i));
+        StdOut.println("Cluster assignments:");
+        for (int i = 0; i < locations1.length; i++) {
+            StdOut.println("Point " + i + ": Cluster " + clustering1.clusterOf(i));
         }
 
         // Test reduceDimensions method
-        int[] input = { 1, 2, 3, 4, 5 };
-        int[] reduced = clustering.reduceDimensions(input);
-        System.out.println("Reduced dimensions: ");
-        for (int i = 0; i < reduced.length; i++) {
-            System.out.println("Cluster " + i + ": " + reduced[i]);
+        int[] input1 = { 1, 2, 3, 4, 5 };
+        int[] reduced1 = clustering1.reduceDimensions(input1);
+        StdOut.println("Reduced dimensions: ");
+        for (int i = 0; i < reduced1.length; i++) {
+            StdOut.println("Cluster " + i + ": " + reduced1[i]);
         }
 
         // Test case 2: Invalid arguments
         try {
-            new Clustering(null, k);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exception caught: " + e.getMessage());
+            Clustering clustering2 = new Clustering(null, k1);
+        }
+        catch (IllegalArgumentException e) {
+            StdOut.println("Exception caught: " + e.getMessage());
         }
 
         try {
-            new Clustering(locations, 0);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exception caught: " + e.getMessage());
+            Clustering clustering3 = new Clustering(locations1, 0);
+        }
+        catch (IllegalArgumentException e) {
+            StdOut.println("Exception caught: " + e.getMessage());
         }
 
         try {
-            new Clustering(locations, locations.length + 1);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exception caught: " + e.getMessage());
+            Clustering clustering4 = new Clustering(locations1, locations1.length + 1);
+        }
+        catch (IllegalArgumentException e) {
+            StdOut.println("Exception caught: " + e.getMessage());
         }
 
         try {
-            clustering.clusterOf(-1);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exception caught: " + e.getMessage());
+            clustering1.clusterOf(-1);
+        }
+        catch (IllegalArgumentException e) {
+            StdOut.println("Exception caught: " + e.getMessage());
         }
 
         try {
-            clustering.clusterOf(locations.length);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exception caught: " + e.getMessage());
+            clustering1.clusterOf(locations1.length);
+        }
+        catch (IllegalArgumentException e) {
+            StdOut.println("Exception caught: " + e.getMessage());
         }
 
         try {
-            clustering.reduceDimensions(null);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exception caught: " + e.getMessage());
+            clustering1.reduceDimensions(null);
+        }
+        catch (IllegalArgumentException e) {
+            StdOut.println("Exception caught: " + e.getMessage());
         }
 
         try {
-            clustering.reduceDimensions(new int[locations.length - 1]);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exception caught: " + e.getMessage());
+            clustering1.reduceDimensions(new int[locations1.length - 1]);
+        }
+        catch (IllegalArgumentException e) {
+            StdOut.println("Exception caught: " + e.getMessage());
         }
     }
 }

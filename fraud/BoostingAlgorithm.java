@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoostingAlgorithm {
-    private final Clustering clustering;
-    private final int[][] reducedInput;
-    private final int[] labels;
-    private final double[] weights;
-    private final List<WeakLearner> weakLearners;
+    private final Clustering clustering;    // clustering object
+    private final int[][] reducedInput;     // reduced input dimensions
+    private final int[] labels;             // labels of the input
+    private final double[] weights;         // weights of the input points
+    private final List<WeakLearner> weakLearners;  // list of weak learners
 
     // create the clusters and initialize your data structures
     public BoostingAlgorithm(int[][] input, int[] labels, Point2D[] locations, int k) {
@@ -31,7 +31,7 @@ public class BoostingAlgorithm {
         for (int i = 0; i < n; i++) {
             reducedInput[i] = clustering.reduceDimensions(input[i]);
         }
-        this.labels = labels;
+        this.labels = labels.clone();  // create a defensive copy of labels
         weights = new double[n];
         for (int i = 0; i < n; i++) {
             weights[i] = 1.0 / n;
@@ -83,9 +83,11 @@ public class BoostingAlgorithm {
                 ones++;
         }
 
-        return (ones >= zeroes) ? 1 : 0;
+        if (ones >= zeroes)
+            return 1;
+        else
+            return 0;
     }
-
 
     // unit testing (required)
     public static void main(String[] args) {
