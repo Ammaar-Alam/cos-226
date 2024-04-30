@@ -1,56 +1,72 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.Arrays;
+
 public class WeakLearner {
     private final int dp;  // dimension predictor
     private final int vp;  // value predictor
     private final int sp;  // sign predictor
+    private final int k;   // number of clusters
 
+    // train the weak learner
     public WeakLearner(int[][] input, double[] weights, int[] labels) {
-        if (input == null || weights == null || labels == null)
-            throw new IllegalArgumentException("Input arrays must not be null");
-        if (input.length == 0)
-            throw new IllegalArgumentException("Input data cannot be empty");
-        if (input.length != weights.length || input.length != labels.length)
-            throw new IllegalArgumentException("Input arrays must be of equal length");
-
+        if (input == null || weights == null || labels == null || input.length !=
+                weights.length || input.length != labels.length)
+            throw new IllegalArgumentException("input arrays must not be null and = "
+                                                       + "length");
         for (double weight : weights) {
             if (weight < 0)
-                throw new IllegalArgumentException("Weights must be non-negative");
+                throw new IllegalArgumentException("weights cant be negative");
         }
-
         for (int label : labels) {
             if (label != 0 && label != 1)
                 throw new IllegalArgumentException("Labels must be 0 or 1");
         }
 
         int n = input.length;
-        int k = input[0].length;
+        k = input[0].length;
 
         double bestWeightCorrect = Double.NEGATIVE_INFINITY;
         int bestDp = -1, bestVp = Integer.MAX_VALUE, bestSp = -1;
 
-        for (int dimension = 0; dimension < k; dimension++) {
-            for (int splitIndex = 0; splitIndex < n; splitIndex++) {
-                int threshold = input[splitIndex][dimension];
-                for (int sign = 0; sign <= 1; sign++) {
-                    double weightCorrect = 0;
+        for (int dim = 0; dim < k; dim++) {
+            Indices[] indices = new Indices[n];
+            for (int i = 0; i < n; i++) {
+                indices[i] = new Indices(i, input[i][dim]);
+            }
+            Arrays.sort(indices);
 
-                    for (int i = 0; i < n; i++) {
-                        int predicted = predictWith(input[i][dimension], threshold, sign);
-                        if (predicted == labels[i]) {
-                            weightCorrect += weights[i];
-                        }
+            for (int sign = 0; sign <= 1; sign++) {
+                double weightCorrect = 0.0;
+
+                for (int i = 0; i < n; i++) {
+                    int idx = indices[i].index;
+                    if (labels[idx] != sign) weightCorrect += weights[idx];
+                }
+
+                for (int i = 0; i < n; i++) {
+                    int idx = indices[i].index;
+                    double weight = weights[idx];
+
+                    if (labels[idx] == sign) {
+                        weightCorrect += weight;
+                    }
+                    else {
+                        weightCorrect -= weight;
                     }
 
+                    if ((i + 1 < n) && (indices[i].val == indices[i + 1].val))
+                        continue;
+
                     if (weightCorrect > bestWeightCorrect ||
-                            (weightCorrect == bestWeightCorrect && (dimension < bestDp ||
-                                    (dimension == bestDp && threshold < bestVp) ||
-                                    (dimension == bestDp && threshold == bestVp
+                            (weightCorrect == bestWeightCorrect && (dim < bestDp ||
+                                    (dim == bestDp && indices[i].val < bestVp) ||
+                                    (dim == bestDp && indices[i].val == bestVp
                                             && sign < bestSp)))) {
                         bestWeightCorrect = weightCorrect;
-                        bestDp = dimension;
-                        bestVp = threshold;
+                        bestDp = dim;
+                        bestVp = indices[i].val;
                         bestSp = sign;
                     }
                 }
@@ -62,6 +78,20 @@ public class WeakLearner {
         this.sp = bestSp;
     }
 
+    private static class Indices implements Comparable<Indices> {
+        private final int index;
+        private final int val;
+
+        public Indices(int index, int val) {
+            this.index = index;
+            this.val = val;
+        }
+
+        public int compareTo(Indices that) {
+            return Integer.compare(this.val, that.val);
+        }
+    }
+
     private int predictWith(int value, int threshold, int sign) {
         if (sign == 0) {
             return value > threshold ? 1 : 0;
@@ -71,24 +101,28 @@ public class WeakLearner {
         }
     }
 
+    // return the prediction of the learner for a new sample
     public int predict(int[] sample) {
-        if (sample == null || sample.length <= dp)
-            throw new IllegalArgumentException("Invalid sample");
+        if (sample == null || sample.length != k)
+            throw new IllegalArgumentException("invalid smaple");
         return predictWith(sample[dp], vp, sp);
     }
 
+    // return the dimension the learner uses to separate the data
     public int dimensionPredictor() {
         return dp;
     }
 
+    // return the value the learner uses to separate the data
     public int valuePredictor() {
         return vp;
     }
 
+    // return the sign the learner uses to separate the data
     public int signPredictor() {
         return sp;
     }
-    
+
     public static void main(String[] args) {
         In datafile = new In(args[0]);
         int n = datafile.readInt();
