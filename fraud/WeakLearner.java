@@ -11,17 +11,18 @@ public class WeakLearner {
 
     // train the weak learner
     public WeakLearner(int[][] input, double[] weights, int[] labels) {
-        if (input == null || weights == null || labels == null || input.length !=
-                weights.length || input.length != labels.length)
-            throw new IllegalArgumentException("input arrays must not be null and = "
-                                                       + "length");
+        if (input == null || weights == null || labels == null ||
+                input.length != weights.length
+                || input.length != labels.length)
+            throw new IllegalArgumentException("input arrays cant be null and "
+                                                       + "must be equal length");
         for (double weight : weights) {
             if (weight < 0)
                 throw new IllegalArgumentException("weights cant be negative");
         }
         for (int label : labels) {
             if (label != 0 && label != 1)
-                throw new IllegalArgumentException("Labels must be 0 or 1");
+                throw new IllegalArgumentException("labels must be 0 or 1");
         }
 
         int n = input.length;
@@ -79,26 +80,32 @@ public class WeakLearner {
     }
 
     private static class Indices implements Comparable<Indices> {
+        // represents the index of the value in the input array
         private final int index;
+        // represents the value in the input array
         private final int val;
 
+        // initializes index and value
         public Indices(int index, int val) {
             this.index = index;
             this.val = val;
         }
 
+        // compares the values between two Indices and returns an
+        // int based on the result of the compare method
         public int compareTo(Indices that) {
             return Integer.compare(this.val, that.val);
         }
     }
 
+    // predicts the label based on the value, threshold, and sign
     private int predictWith(int value, int threshold, int sign) {
         if (sign == 0) {
-            return value > threshold ? 1 : 0;
+            if (value > threshold) return 1;
+            else return 0;
         }
-        else {
-            return value <= threshold ? 1 : 0;
-        }
+        else if (value <= threshold) return 1;
+        else return 0;
     }
 
     // return the prediction of the learner for a new sample
