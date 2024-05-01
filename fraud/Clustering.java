@@ -12,7 +12,7 @@ public class Clustering {
     // run the clustering algorithm and create the clusters
     public Clustering(Point2D[] locations, int k) {
         if (locations == null || k < 1 || k > locations.length)
-            throw new IllegalArgumentException("Invalid arguments");
+            throw new IllegalArgumentException("invalid arguments");
 
         this.k = k;
         int n = locations.length;
@@ -51,14 +51,14 @@ public class Clustering {
     // return the cluster of the ith point
     public int clusterOf(int i) {
         if (i < 0 || i >= clusters.length)
-            throw new IllegalArgumentException("Invalid index");
+            throw new IllegalArgumentException("in alid index");
         return clusters[i];
     }
 
     // use the clusters to reduce the dimensions of an input
     public int[] reduceDimensions(int[] input) {
         if (input == null || input.length != clusters.length)
-            throw new IllegalArgumentException("Invalid input");
+            throw new IllegalArgumentException("invalid input");
 
         int[] reduced = new int[k];
         for (int i = 0; i < input.length; i++) {
@@ -69,7 +69,7 @@ public class Clustering {
 
     // unit testing (required)
     public static void main(String[] args) {
-        // Test case 1: Normal usage
+        // t1
         Point2D[] locations1 = {
                 new Point2D(0, 0),
                 new Point2D(1, 1),
@@ -80,21 +80,21 @@ public class Clustering {
         int k1 = 2;
         Clustering clustering1 = new Clustering(locations1, k1);
 
-        // Test clusterOf method
-        StdOut.println("Cluster assignments:");
+        // test clusterOf method
+        StdOut.println("cluster assignments:");
         for (int i = 0; i < locations1.length; i++) {
             StdOut.println("Point " + i + ": Cluster " + clustering1.clusterOf(i));
         }
 
-        // Test reduceDimensions method
+        // test reduceDimensions method
         int[] input1 = { 1, 2, 3, 4, 5 };
         int[] reduced1 = clustering1.reduceDimensions(input1);
-        StdOut.println("Reduced dimensions: ");
+        StdOut.println("reduced dimensions: ");
         for (int i = 0; i < reduced1.length; i++) {
             StdOut.println("Cluster " + i + ": " + reduced1[i]);
         }
 
-        // Test case 2: Invalid arguments
+        // invalid args test
         try {
             Clustering clustering2 = new Clustering(null, k1);
         }

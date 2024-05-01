@@ -3,7 +3,8 @@ Programming Assignment 7: Fraud Detection
 /* *****************************************************************************
  *  Describe how you implemented the Clustering constructor
  **************************************************************************** */
-1. Created a complete EdgeWeightedGraph with the Points2D as vertices and edges weighted by Euclidean distance.
+1. Created a complete EdgeWeightedGraph with the Points2D as vertices and edges weighted
+by Euclidean distance.
 2. Computed the minimum spanning tree using KruskalMST.
 3. Grabbed the k-1 lowest weight edges from the MST to form the cluster graph.
 4. Used the CC class to find the connected components, which represent the clusters.

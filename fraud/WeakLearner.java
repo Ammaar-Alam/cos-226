@@ -22,52 +22,48 @@ public class WeakLearner {
         }
         for (int label : labels) {
             if (label != 0 && label != 1)
-                throw new IllegalArgumentException("labels must be 0 or 1");
+                throw new IllegalArgumentException("lavles must be 0 or 1");
         }
 
         int n = input.length;
         k = input[0].length;
 
-        double bestWeightCorrect = Double.NEGATIVE_INFINITY;
+        double bestsumWeight = Double.NEGATIVE_INFINITY;
         int bestDp = -1, bestVp = Integer.MAX_VALUE, bestSp = -1;
 
-        for (int dim = 0; dim < k; dim++) {
-            Indices[] indices = new Indices[n];
+        for (int d = 0; d < k; d++) {
+            IndexValue[] indexValue = new IndexValue[n];
             for (int i = 0; i < n; i++) {
-                indices[i] = new Indices(i, input[i][dim]);
+                indexValue[i] = new IndexValue(i, input[i][d]);
             }
-            Arrays.sort(indices);
+            Arrays.sort(indexValue);
 
             for (int sign = 0; sign <= 1; sign++) {
-                double weightCorrect = 0.0;
+                double sumWeight = 0.0;
 
                 for (int i = 0; i < n; i++) {
-                    int idx = indices[i].index;
-                    if (labels[idx] != sign) weightCorrect += weights[idx];
+                    int index = indexValue[i].index;
+                    if (labels[index] != sign) sumWeight += weights[index];
                 }
 
                 for (int i = 0; i < n; i++) {
-                    int idx = indices[i].index;
-                    double weight = weights[idx];
+                    int index = indexValue[i].index;
+                    double weight = weights[index];
 
-                    if (labels[idx] == sign) {
-                        weightCorrect += weight;
-                    }
-                    else {
-                        weightCorrect -= weight;
-                    }
+                    if (labels[index] == sign) sumWeight += weight;
+                    else sumWeight -= weight;
 
-                    if ((i + 1 < n) && (indices[i].val == indices[i + 1].val))
-                        continue;
+                    if ((i + 1 < n) && (indexValue[i + 1].val
+                            == indexValue[i].val)) continue;
 
-                    if (weightCorrect > bestWeightCorrect ||
-                            (weightCorrect == bestWeightCorrect && (dim < bestDp ||
-                                    (dim == bestDp && indices[i].val < bestVp) ||
-                                    (dim == bestDp && indices[i].val == bestVp
+                    if (sumWeight > bestsumWeight ||
+                            (sumWeight == bestsumWeight && (d < bestDp ||
+                                    (d == bestDp && indexValue[i].val < bestVp) ||
+                                    (d == bestDp && indexValue[i].val == bestVp
                                             && sign < bestSp)))) {
-                        bestWeightCorrect = weightCorrect;
-                        bestDp = dim;
-                        bestVp = indices[i].val;
+                        bestsumWeight = sumWeight;
+                        bestDp = d;
+                        bestVp = indexValue[i].val;
                         bestSp = sign;
                     }
                 }
@@ -79,21 +75,21 @@ public class WeakLearner {
         this.sp = bestSp;
     }
 
-    private static class Indices implements Comparable<Indices> {
+    private static class IndexValue implements Comparable<IndexValue> {
         // represents the index of the value in the input array
         private final int index;
         // represents the value in the input array
         private final int val;
 
         // initializes index and value
-        public Indices(int index, int val) {
+        public IndexValue(int index, int val) {
             this.index = index;
             this.val = val;
         }
 
-        // compares the values between two Indices and returns an
+        // compares the values between two IndexValue and returns an
         // int based on the result of the compare method
-        public int compareTo(Indices that) {
+        public int compareTo(IndexValue that) {
             return Integer.compare(this.val, that.val);
         }
     }
