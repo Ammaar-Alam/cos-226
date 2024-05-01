@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.Stopwatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +104,9 @@ public class BoostingAlgorithm {
         int[] testingLabels = testing.getLabels();
         Point2D[] trainingLocations = training.getLocations();
 
+        // stopwatch for readme
+        Stopwatch timer = new Stopwatch();
+
         // train the model
         BoostingAlgorithm model = new BoostingAlgorithm(trainingInput, trainingLabels,
                                                         trainingLocations, k);
@@ -125,5 +129,6 @@ public class BoostingAlgorithm {
 
         StdOut.println("Training accuracy of model: " + training_accuracy);
         StdOut.println("Test accuracy of model: " + test_accuracy);
+        StdOut.println("Time elasped: " + timer.elapsedTime());
     }
 }

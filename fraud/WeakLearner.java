@@ -101,11 +101,11 @@ public class WeakLearner {
     // predicts the label based on the value, threshold, and sign
     private int predictWith(int value, int threshold, int sign) {
         if (sign == 0) {
-            if (value > threshold) return 1;
-            else return 0;
+            return value <= threshold ? 0 : 1; // pls just lemme use these for once :(
         }
-        else if (value <= threshold) return 1;
-        else return 0;
+        else {
+            return value <= threshold ? 1 : 0; // pls i beg
+        }
     }
 
     // return the prediction of the learner for a new sample
