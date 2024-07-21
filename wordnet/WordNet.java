@@ -2,7 +2,6 @@ import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,18 +9,19 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class WordNet {
+
     // changed to hashset for optimization
     private final Map<String, Set<Integer>> nounToSynsets; // noun to synset IDs
-    private final Map<Integer, String> synsetToNouns;      // synset ID to nouns
-    private final Digraph digraph;                         // underlying digraph
-    private final ShortestCommonAncestor sca;              // pre-processed SCA
-    private Set<String> allNounsCache;                     // cache for nouns()
-
+    private final Map<Integer, String> synsetToNouns; // synset ID to nouns
+    private final Digraph digraph; // underlying digraph
+    private final ShortestCommonAncestor sca; // pre-processed SCA
+    private Set<String> allNounsCache; // cache for nouns()
 
     // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms) {
-        if (synsets == null || hypernyms == null)
-            throw new IllegalArgumentException("input files cannot be null");
+        if (synsets == null || hypernyms == null) throw new IllegalArgumentException(
+            "input files cannot be null"
+        );
 
         nounToSynsets = new HashMap<>();
         synsetToNouns = new HashMap<>();
@@ -42,8 +42,7 @@ public class WordNet {
         for (int i = 0; i < digraph.V(); i++) {
             if (digraph.outdegree(i) == 0) roots++;
         }
-        if (roots != 1) throw new
-                IllegalArgumentException("input does not have a single root");
+        if (roots != 1) throw new IllegalArgumentException("input does not have a single root");
 
         sca = new ShortestCommonAncestor(digraph);
     }
@@ -93,17 +92,18 @@ public class WordNet {
     // a synset (second field of synsets.txt) that is a shortest common ancestor
     // of noun1 and noun2 (defined below)
     public String sca(String nounA, String nounB) {
-        if (!isNoun(nounA) || !isNoun(nounB))
-            throw new IllegalArgumentException("input is not a WordNet noun");
-        int ancestor = sca.ancestorSubset(nounToSynsets.get(nounA),
-                                          nounToSynsets.get(nounB));
+        if (!isNoun(nounA) || !isNoun(nounB)) throw new IllegalArgumentException(
+            "input is not a WordNet noun"
+        );
+        int ancestor = sca.ancestorSubset(nounToSynsets.get(nounA), nounToSynsets.get(nounB));
         return synsetToNouns.get(ancestor);
     }
 
     // distance between noun1 and noun2 (defined below)
     public int distance(String nounA, String nounB) {
-        if (!isNoun(nounA) || !isNoun(nounB))
-            throw new IllegalArgumentException("input is not a WordNet noun");
+        if (!isNoun(nounA) || !isNoun(nounB)) throw new IllegalArgumentException(
+            "input is not a WordNet noun"
+        );
         return sca.lengthSubset(nounToSynsets.get(nounA), nounToSynsets.get(nounB));
     }
 
@@ -116,12 +116,16 @@ public class WordNet {
         StdOut.println("Is 'notaword' a noun? " + wordnet.isNoun("notaword"));
 
         // test distance
-        StdOut.println("Distance between 'white_marlin' and 'mileage' is " +
-                               wordnet.distance("white_marlin", "mileage"));
+        StdOut.println(
+            "Distance between 'white_marlin' and 'mileage' is " +
+            wordnet.distance("white_marlin", "mileage")
+        );
 
         // test sca
-        StdOut.println("A common ancestor of 'individual' and 'edible_fruit' is " +
-                               wordnet.sca("individual", "edible_fruit"));
+        StdOut.println(
+            "A common ancestor of 'individual' and 'edible_fruit' is " +
+            wordnet.sca("individual", "edible_fruit")
+        );
 
         // test nouns
         StdOut.println("\nAll nouns:");
