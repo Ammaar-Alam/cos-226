@@ -125,10 +125,10 @@ Most of the dependencies that I used are contained within the course's algs4.jar
       </a>
     </td>
     <td>
-      <div align="center"> TBD </div>
+      <div align="center"> Implement a machine learning model to detect fraudulent credit card transactions </div>
     </td>
     <td>
-      <div align="center"> TBD </div>
+      <div align="center"> clustering algorithms, dimensionality reduction, weak learners, boosting algorithms, decision stumps, AdaBoost </div>
     </td>
   </tr>
 </table>
